@@ -1,0 +1,73 @@
+{% extends "admin/change_form.html" %}
+{% load admin_urls %}
+
+{% block after_field_sets %}
+{{ block.super }}
+
+{% if original.status == 'Solution Proposed' and original.llm_solution %}
+<fieldset class="module aligned">
+    <h2>Solution Feedback</h2>
+    <div class="form-row">
+        <p>Did the proposed solution resolve the issue?</p>
+        <div>
+            <!-- Simple 1-5 Star Rating -->
+            <div class="rating">
+                <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+            </div>
+            <br>
+            <button id="solve-button" class="button">✅ Yes, this solved the problem</button>
+            <button id="reopen-button" class="button" style="background-color: #c0392b;">❌ No, this did not work</button>
+        </div>
+    </div>
+</fieldset>
+
+<style>
+  .rating { display: inline-block; unicode-bidi: bidi-override; direction: rtl; }
+  .rating > input { display: none; }
+  .rating > label { display: inline-block; padding: 5px; font-size: 2rem; color: #ccc; cursor: pointer; }
+  .rating > input:checked ~ label,
+  .rating:not(:checked) > label:hover,
+  .rating:not(:checked) > label:hover ~ label { color: #f7d106; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const solveButton = document.getElementById('solve-button');
+    const reopenButton = document.getElementById('reopen-button');
+    const ticketId = "{{ original.pk }}";
+
+    solveButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        const rating = document.querySelector('input[name="rating"]:checked');
+        if (!rating) {
+            alert("Please select a star rating before closing the ticket.");
+            return;
+        }
+        
+        fetch(`/api/v1/ticket/${ticketId}/resolve`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ rating: parseInt(rating.value) })
+        }).then(response => {
+            if (response.ok) {
+                alert('Thank you for your feedback! This ticket is now closed.');
+                location.reload();
+            } else {
+                alert('Error: Could not close the ticket.');
+            }
+        });
+    });
+
+    reopenButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        alert("Please type your reason why the solution did not work in the 'Your Reply' box above and click 'Save'.");
+        document.getElementById('id_user_reply').focus();
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,11 +1,13 @@
 # main.py
 
+import os
 import json
 import traceback
 import random
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
-from typing import List, Optional
+import google.generativeai as genai
+from pgvector.psycopg2 import register_vector
 
 from database import get_db_connection
 from agents import run_initial_workflow, high_cpu_agent_node, connectivity_agent_node, TicketState
@@ -20,32 +22,25 @@ class PrtgAlert(BaseModel):
 class UserReply(BaseModel):
     message: str
 
+class ResolveTicket(BaseModel):
+    rating: int
+
+# --- Configure Embedding Model ---
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
 # --- FastAPI App ---
-app = FastAPI(
-    title="NexusAI - Asynchronous AI API",
-    version="3.0.0",
-    description="This API receives PRTG alerts, processes them with an AI agent workflow, and enables asynchronous conversational diagnostics."
-)
+app = FastAPI(title="NexusAI - Self-Improving AI API", version="4.0.1")
 
 # --- Helper Functions ---
 def translate_prtg_to_description(alert: PrtgAlert) -> tuple[str, str]:
-    """Translates a concise PRTG alert into a descriptive problem statement for the LLM."""
     alert_type = f"{alert.sensor} on {alert.device}"
     if alert.status.lower() == 'down':
-        description = (
-            f"The '{alert.sensor}' sensor on device '{alert.device}' has reported a 'Down' status. "
-            f"The specific error message from PRTG is: '{alert.message}'. "
-            "This indicates a potential connectivity failure, device outage, or service interruption."
-        )
+        description = (f"The '{alert.sensor}' sensor on device '{alert.device}' has reported a 'Down' status. PRTG message: '{alert.message}'.")
     else:
-        description = (
-            f"The '{alert.sensor}' sensor on device '{alert.device}' has reported a '{alert.status}' status. "
-            f"The message provided by PRTG is: '{alert.message}'."
-        )
+        description = (f"The '{alert.sensor}' sensor on '{alert.device}' has a '{alert.status}' status. PRTG message: '{alert.message}'.")
     return alert_type, description
 
 def generate_unique_ticket_uid(cursor) -> int:
-    """Generates a random 8-digit ID and ensures it's unique in the database."""
     while True:
         ticket_uid = random.randint(10000000, 99999999)
         cursor.execute("SELECT id FROM tickets WHERE ticket_uid = %s", (ticket_uid,))
@@ -54,9 +49,6 @@ def generate_unique_ticket_uid(cursor) -> int:
 
 # --- Background Task Function ---
 def process_ai_conversation_in_background(ticket_id: int, current_state: TicketState):
-    """
-    This function runs in the background. It contains the slow AI call and subsequent database updates.
-    """
     print(f"---BACKGROUND TASK STARTED for ticket {ticket_id}---")
     conn = None
     try:
@@ -96,39 +88,56 @@ def process_ai_conversation_in_background(ticket_id: int, current_state: TicketS
         print(f"❌❌❌ ERROR in background task for ticket {ticket_id}: {e} ❌❌❌")
         traceback.print_exc()
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()
 
 # --- API Endpoints ---
-
 @app.get("/")
 def read_root():
     return {"status": "NexusAI API is running"}
 
 @app.post("/api/v1/prtg-alert", status_code=201)
 def process_prtg_alert(alert: PrtgAlert):
-    """Receives an alert from PRTG, creates a ticket with a unique UID, and initiates the AI workflow."""
     conn = None
     try:
         alert_type, issue_description = translate_prtg_to_description(alert)
-        print(f"✅ Received and translated PRTG alert for '{alert.device}'.")
         conn = get_db_connection()
+        register_vector(conn)
         cursor = conn.cursor()
 
-        # Generate the new unique 8-digit ticket ID
-        new_ticket_uid = generate_unique_ticket_uid(cursor)
-        print(f"✅ Generated unique ticket UID: {new_ticket_uid}")
+        print("🔎 Performing semantic search for similar past tickets...")
+        new_embedding = genai.embed_content(model="models/text-embedding-004", content=issue_description)["embedding"]
+        
+        sql_search = "SELECT ticket_uid, llm_solution FROM tickets WHERE status = 'Closed' AND embedding IS NOT NULL AND embedding <=> %s < 0.2 ORDER BY embedding <=> %s LIMIT 1;"
+        
+        # FIX: Convert the embedding list to a string for pgvector
+        cursor.execute(sql_search, (str(new_embedding), str(new_embedding)))
+        
+        similar_ticket = cursor.fetchone()
 
-        sql_insert = """
-            INSERT INTO tickets (ticket_uid, device_name, alert_type, issue_description, sensor, prtg_status, prtg_message, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
-        """
-        cursor.execute(sql_insert, (
-            new_ticket_uid, alert.device, alert_type, issue_description,
-            alert.sensor, alert.status, alert.message, 'Processing'
-        ))
+        if similar_ticket:
+            similar_ticket_uid, similar_solution = similar_ticket
+            print(f"✅ Found a similar past solution in ticket UID {similar_ticket_uid}.")
+            
+            new_ticket_uid = generate_unique_ticket_uid(cursor)
+            solution_text = (f"**Knowledge Base Match Found:**\n\nA similar issue was resolved in the past. "
+                           f"Please review the solution from **Ticket #{similar_ticket_uid}** below.\n\n---\n\n"
+                           f"**Past Solution:**\n{similar_solution}\n\n---\n\n"
+                           f"If this does not resolve your issue, please use the feedback options to reopen this ticket for AI analysis.")
+            
+            sql_insert = "INSERT INTO tickets (ticket_uid, device_name, alert_type, issue_description, sensor, prtg_status, prtg_message, status, llm_solution) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"
+            cursor.execute(sql_insert, (new_ticket_uid, alert.device, alert_type, issue_description, alert.sensor, alert.status, alert.message, 'Solution Proposed', solution_text))
+            new_internal_id = cursor.fetchone()[0]
+            conn.commit()
+
+            return {"status": "Found similar past solution", "ticket_uid": new_ticket_uid, "similar_ticket_uid": similar_ticket_uid}
+
+        print("... No similar solution found. Proceeding with full AI workflow.")
+        new_ticket_uid = generate_unique_ticket_uid(cursor)
+        sql_insert = "INSERT INTO tickets (ticket_uid, device_name, alert_type, issue_description, sensor, prtg_status, prtg_message, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"
+        cursor.execute(sql_insert, (new_ticket_uid, alert.device, alert_type, issue_description, alert.sensor, alert.status, alert.message, 'Processing'))
         new_internal_id = cursor.fetchone()[0]
         conn.commit()
-        print(f"✅ Ticket {new_internal_id} (UID: {new_ticket_uid}) created successfully.")
 
         sql_history = "SELECT created_at, issue_description, llm_solution FROM tickets WHERE device_name = %s AND id != %s AND status = 'Closed' ORDER BY created_at DESC LIMIT 5;"
         cursor.execute(sql_history, (alert.device, new_internal_id))
@@ -136,11 +145,7 @@ def process_prtg_alert(alert: PrtgAlert):
         if past_tickets := cursor.fetchall():
             history_text = "Previously closed tickets:\n" + "\n".join([f"- On {t[0].strftime('%Y-%m-%d')}, issue '{t[1]}' was resolved with: '{t[2]}'" for t in past_tickets])
         
-        print("🤖 Handing ticket to AI workflow...")
-        ticket_data_for_ai = {
-            "alert_type": alert_type, "device_name": alert.device,
-            "issue_description": issue_description, "history_text": history_text
-        }
+        ticket_data_for_ai = {"alert_type": alert_type, "device_name": alert.device, "issue_description": issue_description, "history_text": history_text}
         ai_result = run_initial_workflow(ticket_data_for_ai)
 
         new_status = 'Processing'
@@ -160,26 +165,50 @@ def process_prtg_alert(alert: PrtgAlert):
         cursor.execute(sql_update, (ai_result.get("assigned_agent"), ai_result.get("llm_solution"), new_status, new_internal_id))
         conn.commit()
         
-        print(f"✅ Ticket {new_internal_id} updated with initial AI analysis.")
-        return {
-            "status": "PRTG alert processed, AI analysis initiated",
-            "ticket_uid": new_ticket_uid,
-            "internal_id": new_internal_id,
-            "ai_analysis": ai_result
-        }
+        return {"status": "PRTG alert processed, AI analysis initiated", "ticket_uid": new_ticket_uid, "internal_id": new_internal_id}
+
     except Exception as e:
         print(f"❌ Error in PRTG alert processing: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()
+
+@app.post("/api/v1/ticket/{ticket_id}/resolve")
+def resolve_ticket(ticket_id: int, feedback: ResolveTicket):
+    conn = None
+    try:
+        conn = get_db_connection()
+        register_vector(conn)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT issue_description FROM tickets WHERE id = %s", (ticket_id,))
+        ticket = cursor.fetchone()
+        if not ticket:
+            raise HTTPException(status_code=404, detail="Ticket not found")
+        issue_description = ticket[0]
+
+        print(f"✅ Ticket {ticket_id} solved. Generating embedding to add to knowledge base...")
+        embedding = genai.embed_content(model="models/text-embedding-004", content=issue_description)["embedding"]
+
+        sql_update = "UPDATE tickets SET status = 'Closed', solution_rating = %s, embedding = %s WHERE id = %s;"
+        
+        # FIX: Convert the embedding list to a string for pgvector
+        cursor.execute(sql_update, (feedback.rating, str(embedding), ticket_id))
+        
+        conn.commit()
+        return {"status": "Ticket closed and added to knowledge base."}
+    except Exception as e:
+        print(f"❌ Error in resolve_ticket endpoint: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()
 
 @app.post("/api/v1/ticket/{ticket_id}/continue")
 def continue_conversation(ticket_id: int, reply: UserReply, background_tasks: BackgroundTasks):
-    """
-    Instantly saves the user's reply, schedules the AI to run in the background, and returns an immediate response.
-    """
-    print(f"\n---FASTAPI ENDPOINT HIT--- \n✅ /continue called for ticket_id: {ticket_id}")
     conn = None
     try:
         conn = get_db_connection()
@@ -217,4 +246,5 @@ def continue_conversation(ticket_id: int, reply: UserReply, background_tasks: Ba
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()

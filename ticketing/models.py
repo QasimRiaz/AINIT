@@ -16,6 +16,7 @@ class Ticket(models.Model):
     llm_questions = models.TextField(blank=True, null=True)
     llm_solution = models.TextField(blank=True, null=True)
     resolution_feedback = models.CharField(max_length=50, blank=True, null=True)
+    solution_rating = models.IntegerField(blank=True, null=True)
 
     # ADD THESE NEW FIELDS
     sensor = models.CharField(max_length=255, blank=True, null=True)
