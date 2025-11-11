@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">
+        NexusAI Network Operations
+    </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    :root {
+      --primary: #2c3e50; /* Dark Blue */
+      --secondary: #34495e; /* Lighter Dark Blue */
+      --accent: #1abc9c; /* Teal */
+      --primary-fg: #ecf0f1; /* Light Grey Text */
+    }
+    #header {
+      background-color: var(--primary);
+      color: var(--primary-fg);
+    }
+    #header a:link, #header a:visited {
+      color: var(--primary-fg);
+    }
+    div.breadcrumbs {
+      background-color: var(--secondary);
+    }
+    .module h2, .module caption, .inline-group h2 {
+      background-color: var(--secondary);
+    }
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+      background-color: var(--accent);
+    }
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+      background-color: #16a085; /* Darker Teal */
+    }
+  </style>
+{% endblock %}

@@ -7,6 +7,7 @@ from django.db import models
 class Ticket(models.Model):
     # Field definitions that match our database columns
     alert_type = models.CharField(max_length=255, blank=True, null=True)
+    ticket_uid = models.BigIntegerField(unique=True, blank=True, null=True)
     device_name = models.CharField(max_length=255, blank=True, null=True)
     issue_description = models.TextField(blank=True, null=True)
     history = models.JSONField(blank=True, null=True)
@@ -15,6 +16,12 @@ class Ticket(models.Model):
     llm_questions = models.TextField(blank=True, null=True)
     llm_solution = models.TextField(blank=True, null=True)
     resolution_feedback = models.CharField(max_length=50, blank=True, null=True)
+
+    # ADD THESE NEW FIELDS
+    sensor = models.CharField(max_length=255, blank=True, null=True)
+    prtg_status = models.CharField(max_length=255, blank=True, null=True)
+    prtg_message = models.TextField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True) # auto_now_add is suitable here
     updated_at = models.DateTimeField(auto_now=True) # auto_now is suitable here
 
