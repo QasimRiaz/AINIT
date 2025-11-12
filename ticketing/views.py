@@ -2,8 +2,10 @@
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
-from django.db.models import Count
+from django.db.models import Count, Avg
 from .models import Ticket
+from django.db.models.functions import TruncDate
+
 
 @staff_member_required
 def dashboard_view(request):
@@ -48,3 +50,7 @@ def dashboard_view(request):
     
     # Render the HTML template with our calculated data
     return render(request, 'admin/dashboard.html', context)
+
+# ticketing/views.py
+# (make sure all the imports from Step 1 are there)
+

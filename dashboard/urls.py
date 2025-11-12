@@ -1,14 +1,10 @@
 # dashboard/urls.py
-
 from django.contrib import admin
 from django.urls import path
-
-# Import our dashboard_view from the ticketing app
-from ticketing.views import dashboard_view
+from reporting.views import reporting_dashboard_view
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    # Restore the correct path for our dashboard
-    path('admin/dashboard/', dashboard_view, name='dashboard'),
+    path("admin/", admin.site.urls),
+   
+    path("admin/reporting/", admin.site.admin_view(reporting_dashboard_view), name="reporting"),
 ]

@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ticketing',
     'chartjs',  # <-- Add this
+    'reporting', # <-- ADD THIS NEW APP
 ]
 
 MIDDLEWARE = [
@@ -54,10 +55,9 @@ ROOT_URLCONF = 'dashboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # *** THE FIX IS HERE ***
-        # Tell Django to look in the 'templates' folder at the root of each app
+        # THIS IS THE CORRECT, EXPLICIT PATH FOR YOUR SETUP
         'DIRS': [os.path.join(BASE_DIR, 'ticketing', 'templates')],
-        'APP_DIRS': True, # This should remain True
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -68,6 +68,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'dashboard.wsgi.application'
 

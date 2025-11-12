@@ -1,0 +1,109 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+<style>
+    .kpi-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .kpi-card { flex: 1; min-width: 180px; padding: 1.5rem; background: #fff; border-left: 5px solid #1abc9c; text-align: left; box-shadow: 0 4px 8px rgba(0,0,0,0.08); border-radius: 5px; }
+    .kpi-card h2 { margin: 0; font-size: 2.5rem; color: #2c3e50; }
+    .kpi-card p { margin: 0; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+    .chart-container { background: #fff; padding: 1.5rem; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+</style>
+
+<div style="padding: 2rem;">
+    <h1>NexusAI Reporting Dashboard</h1>
+    <p>High-level trends and performance metrics for your network and AI agent.</p>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+        <div class="kpi-card"><h2>{{ total_tickets }}</h2><p>Total Tickets</p></div>
+        <div class="kpi-card" style="border-left-color: #e67e22;"><h2>{{ open_tickets }}</h2><p>Open Tickets</p></div>
+        <div class="kpi-card" style="border-left-color: #2ecc71;"><h2>{{ closed_tickets }}</h2><p>Closed Tickets</p></div>
+        <div class="kpi-card" style="border-left-color: #3498db;"><h2>{{ success_rate }}%</h2><p>Solution Success Rate</p></div>
+        <div class="kpi-card" style="border-left-color: #9b59b6;"><h2>{{ average_rating }} / 5</h2><p>Average Rating</p></div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="chart-grid">
+        <div class="chart-container">
+            <h3>Daily Ticket Volume</h3>
+            <canvas id="dailyTicketsChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Tickets by Status</h3>
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Top 5 Problematic Devices</h3>
+            <canvas id="topDevicesChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Tickets by Alert Type</h3>
+            <canvas id="typeChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>AI Agent Workload</h3>
+            <canvas id="agentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Safely Pass Data to JavaScript -->
+{{ status_labels|json_script:"status-labels" }}
+{{ status_data|json_script:"status-data" }}
+{{ type_labels|json_script:"type-labels" }}
+{{ type_data|json_script:"type-data" }}
+{{ daily_labels|json_script:"daily-labels" }}
+{{ daily_data|json_script:"daily-data" }}
+{{ top_device_labels|json_script:"top-device-labels" }}
+{{ top_device_data|json_script:"top-device-data" }}
+{{ agent_labels|json_script:"agent-labels" }}
+{{ agent_data|json_script:"agent-data" }}
+
+<!-- Chart.js Library and Initialization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Helper function to get data
+        const getData = (id) => JSON.parse(document.getElementById(id).textContent);
+
+        // Daily Tickets (Line Chart)
+        new Chart(document.getElementById('dailyTicketsChart'), {
+            type: 'line',
+            data: { labels: getData('daily-labels'), datasets: [{ label: 'Tickets Created', data: getData('daily-data'), borderColor: '#3498db', tension: 0.1 }] },
+            options: { responsive: true }
+        });
+
+        // Tickets by Status (Pie Chart)
+        new Chart(document.getElementById('statusChart'), {
+            type: 'pie',
+            data: { labels: getData('status-labels'), datasets: [{ data: getData('status-data'), backgroundColor: ['#e67e22', '#2ecc71', '#f1c40f', '#95a5a6', '#3498db'] }] },
+            options: { responsive: true }
+        });
+
+        // Top Devices (Horizontal Bar Chart)
+        new Chart(document.getElementById('topDevicesChart'), {
+            type: 'bar',
+            data: { labels: getData('top-device-labels'), datasets: [{ label: 'Ticket Count', data: getData('top-device-data'), backgroundColor: '#e74c3c' }] },
+            options: { indexAxis: 'y', responsive: true }
+        });
+
+        // Tickets by Type (Bar Chart)
+        new Chart(document.getElementById('typeChart'), {
+            type: 'bar',
+            data: { labels: getData('type-labels'), datasets: [{ label: 'Ticket Count', data: getData('type-data'), backgroundColor: '#9b59b6' }] },
+            options: { responsive: true }
+        });
+        
+        // Agent Workload (Doughnut Chart)
+        new Chart(document.getElementById('agentChart'), {
+            type: 'doughnut',
+            data: { labels: getData('agent-labels'), datasets: [{ data: getData('agent-data'), backgroundColor: ['#1abc9c', '#f39c12', '#d35400'] }] },
+            options: { responsive: true }
+        });
+    });
+</script>
+{% endblock %}
