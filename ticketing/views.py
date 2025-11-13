@@ -5,8 +5,13 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.db.models import Count, Avg
 from django.db.models.functions import TruncDate
+from django.shortcuts import render
 
 from .models import Ticket
+
+def public_homepage_view(request):
+    """Renders the main public-facing landing page."""
+    return render(request, 'public/homepage.html')
 
 @staff_member_required
 def reporting_dashboard_view(request):

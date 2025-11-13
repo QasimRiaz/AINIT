@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusAI - Intelligent Network Automation</title>
+    <style>
+        /* --- Basic Setup & Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        
+        :root {
+            --primary-dark: #2c3e50;
+            --secondary-dark: #34495e;
+            --accent-teal: #1abc9c;
+            --light-grey: #ecf0f1;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            background-color: #fdfdfd;
+            line-height: 1.6;
+        }
+
+        /* --- General Styling --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        section {
+            padding: 4rem 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--accent-teal);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #16a085;
+        }
+
+        /* --- Header & Hero Section --- */
+        .header {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('https://www.prtg.com/sites/default/files/2023-01/prtg-documentation-discover-your-network.webp') no-repeat center center/cover;
+            color: #fff;
+            padding: 6rem 0;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        .header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        .header .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+        }
+
+        /* --- Feature Section --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .feature-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: left;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+        }
+
+        /* --- Expertise & Logos Section --- */
+        #expertise, #customers {
+            background-color: var(--light-grey);
+        }
+        .expertise-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .expertise-item {
+            background-color: var(--secondary-dark);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 400;
+        }
+        .logos {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            filter: grayscale(100%) opacity(60%);
+            gap: 2rem;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background-color: var(--primary-dark);
+            color: #fff;
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <header class="header">
+        <div class="brand">NexusAI</div>
+        <h1>Intelligent Automation for Your Network</h1>
+        <p>NexusAI leverages advanced AI to diagnose network issues in real-time, reducing downtime and freeing up your engineering team to focus on what matters most.</p>
+        <a href="{% url 'admin:index' %}" class="btn">Client Login</a>
+    </header>
+
+    <main>
+        <!-- The Problem Section -->
+        <section id="problem" class="container">
+            <h2>Stop Chasing Alerts. Start Solving Problems.</h2>
+            <p style="max-width: 700px; margin: 0 auto;">Network complexity is at an all-time high. Your team is buried in alert noise from countless systems, struggling to manually correlate data and find the root cause. This leads to slow resolution times and critical business impact.</p>
+        </section>
+
+        <!-- The Solution Section -->
+        <section id="solution" style="background: #fff;">
+            <div class="container">
+                <h2>The NexusAI Solution</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>AI-Powered Diagnostics</h3>
+                        <p>Our agentic workflow, powered by cutting-edge LLMs, triages alerts, asks the right questions, and pinpoints the root cause through conversational diagnosis.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Self-Improving Knowledge Base</h3>
+                        <p>Every solved ticket enriches our semantic knowledge base. NexusAI learns from past successes to provide instant solutions for recurring problems.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Seamless PRTG Integration</h3>
+                        <p>Connect directly to your PRTG monitoring system. NexusAI automatically ingests alerts via webhooks, kicking off the diagnostic process without human intervention.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Expertise Section -->
+        <section id="expertise">
+            <div class="container">
+                <h2>Our Expertise</h2>
+                <div class="expertise-list">
+                    <span class="expertise-item">Routing & Switching (BGP, OSPF)</span>
+                    <span class="expertise-item">Firewall & Security Policy</span>
+                    <span class="expertise-item">SNMP & WMI Monitoring</span>
+                    <span class="expertise-item">Network Latency Analysis</span>
+                    <span class="expertise-item">VoIP & QoS</span>
+                    <span class="expertise-item">Cloud Networking (AWS, Azure)</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Customers Section -->
+        <section id="customers">
+            <div class="container">
+                <h2>Trusted by Leading Tech Companies</h2>
+                <div class="logos">
+                    <!-- Placeholder logos. You can replace these with real SVG logos. -->
+                    <h3 style="font-weight: 300;">TechCorp</h3>
+                    <h3 style="font-weight: 300;">Innovate Inc.</h3>
+                    <h3 style="font-weight: 300;">GlobalNet</h3>
+                    <h3 style="font-weight: 300;">Quantum Solutions</h3>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; {% now "Y" %} NexusAI. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
