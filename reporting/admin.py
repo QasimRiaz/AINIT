@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.template.response import TemplateResponse
-from .models import ReportingRoot
+from .models import Dashboard
 
-@admin.register(ReportingRoot)
-class ReportingRootAdmin(admin.ModelAdmin):
+@admin.register(Dashboard)
+class DashboardAdmin(admin.ModelAdmin):
     # Hide CRUD
     def has_add_permission(self, request): return False
     def has_change_permission(self, request, obj=None): return False

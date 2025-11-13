@@ -27,15 +27,15 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # dashboard/settings.py
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin',  # This is the only one you need
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ticketing',
-    'chartjs',  # <-- Add this
-    'reporting', # <-- ADD THIS NEW APP
+    'reporting',
+    'chartjs',
 ]
 
 MIDDLEWARE = [

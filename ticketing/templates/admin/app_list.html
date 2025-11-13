@@ -1,0 +1,44 @@
+
+{% load i18n %}
+
+{% if app_list %}
+  {% for app in app_list %}
+    <div class="app-{{ app.app_label }} module">
+      <table>
+        <caption>
+          <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </caption>
+        {% for model in app.models %}
+          <tr class="model-{{ model.object_name|lower }}">
+            {% if model.perms.view or model.perms.change %}
+              <th scope="row">
+                <!-- THIS IS THE MAGIC: If the model is our ReportingDashboard, use a different URL -->
+                {% if model.object_name == 'ReportingDashboard' %}
+                  <a href="{% url 'reporting' %}">{{ model.name }}</a>
+                {% else %}
+                  <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                {% endif %}
+              </th>
+            {% else %}
+              <th scope="row">{{ model.name }}</th>
+            {% endif %}
+
+            {% if model.perms.add %}
+              <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+              <td></td>
+            {% endif %}
+
+            {% if model.perms.change %}
+              <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+              <td></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>{% trans 'You don’t have permission to view or edit anything.' %}</p>
+{% endif %}

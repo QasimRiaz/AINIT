@@ -1,127 +1,84 @@
-# ticketing/views.py
+# reporting/views.py
+
 from django.shortcuts import render
-from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
-from django.db.models import Count, Avg, Q, IntegerField, Case, When
+from django.db.models import Count, Avg
 from django.db.models.functions import TruncDate
-import json
+from ticketing.models import Ticket
 
-from ticketing.models import Ticket, TicketMessage
-
-
+@staff_member_required
 def reporting_dashboard_view(request):
+    raise Exception("HIT REPORTING_DASHBOARD_VIEW")
+    """
+    Calculates and provides all necessary data for the NexusAI Reporting Dashboard,
+    with added debugging print statements.
+    """
+    print("\n--- REPORTING VIEW: STARTING DATA CALCULATION ---")
     today = timezone.localdate()
 
-    # --- KPIs ---
+    # --- 1. Calculate KPIs ---
     total_tickets = Ticket.objects.count()
-    open_tickets = Ticket.objects.exclude(status__in=["Resolved", "Closed"]).count()
-    unsolved_tickets = Ticket.objects.filter(
-        Q(solution_rating__isnull=True) | Q(resolution_feedback__isnull=True) |
-        ~Q(resolution_feedback__iexact="correct")
-    ).count()
-    todays_tickets = Ticket.objects.filter(created_at__date=today).count()
+    closed_tickets = Ticket.objects.filter(status__iexact='Closed').count()
+    open_tickets = total_tickets - closed_tickets
+    today_tickets = Ticket.objects.filter(created_at__date=today).count()
+    correct_solutions = Ticket.objects.filter(resolution_feedback__iexact='correct').count()
+    incorrect_solutions = Ticket.objects.filter(resolution_feedback__iexact='incorrect').count()
+    avg_rating_result = Ticket.objects.filter(solution_rating__isnull=False).aggregate(avg_val=Avg('solution_rating'))
+    average_rating = avg_rating_result['avg_val'] or 0
+    
+    kpis = {
+        "total": total_tickets,
+        "open": open_tickets,
+        "closed": closed_tickets,
+        "today": today_tickets,
+        "avg_rating": round(average_rating, 2),
+    }
+    print(f"1. KPIs Calculated: {kpis}")
 
-    avg_rating = Ticket.objects.filter(solution_rating__isnull=False)\
-        .aggregate(avg=Avg("solution_rating"))["avg"] or 0
+    # --- 2. Prepare Data for Charts ---
+    
+    # Daily Data
+    start_date = today - timezone.timedelta(days=13)
+    daily_series = list(Ticket.objects.filter(created_at__date__gte=start_date).annotate(date=TruncDate('created_at')).values('date').annotate(c=Count('id')).order_by('date'))
+    daily_map = {d['date']: d['c'] for d in daily_series}
+    days_range = [(start_date + timezone.timedelta(days=i)) for i in range(14)]
+    
+    # Status Data
+    status_series = list(Ticket.objects.values('status').annotate(c=Count('id')).order_by('-c'))
 
-    # --- Time series: last 14 days ---
-    start = today - timezone.timedelta(days=13)
-    by_day = (
-        Ticket.objects.filter(created_at__date__gte=start, created_at__date__lte=today)
-        .annotate(day=TruncDate("created_at"))
-        .values("day")
-        .annotate(c=Count("id"))
-        .order_by("day")
-    )
-    days = []
-    day_counts = []
-    d = start
-    counts_map = {row["day"]: row["c"] for row in by_day}
-    while d <= today:
-        days.append(d.isoformat())
-        day_counts.append(counts_map.get(d, 0))
-        d += timezone.timedelta(days=1)
+    # Alert Data
+    alert_series = list(Ticket.objects.values('alert_type').annotate(c=Count('id')).order_by('-c')[:5])
 
-    # --- Tickets by status ---
-    by_status = (
-        Ticket.objects.values("status")
-        .annotate(c=Count("id"))
-        .order_by("-c")
-    )
-    status_labels = [row["status"] or "Unknown" for row in by_status]
-    status_counts = [row["c"] for row in by_status]
+    # Correctness Data
+    correctness_labels = ['Correct', 'Incorrect']
+    correctness_counts = [correct_solutions, incorrect_solutions]
+    
+    # Ratings Data
+    ratings_series = list(Ticket.objects.filter(solution_rating__isnull=False).values('solution_rating').annotate(c=Count('id')).order_by('solution_rating'))
+    
+    # Agent Data
+    agent_series = list(Ticket.objects.exclude(assigned_agent__isnull=True).exclude(assigned_agent='').values('assigned_agent').annotate(c=Count('id')).order_by('-c'))
+    
+    chart_data = {
+        "daily_labels": [d.strftime('%b %d') for d in days_range],
+        "daily_counts": [daily_map.get(d, 0) for d in days_range],
+        "status_labels": [s['status'] or 'N/A' for s in status_series],
+        "status_counts": [s['c'] for s in status_series],
+        "alert_labels": [a['alert_type'] or 'N/A' for a in alert_series],
+        "alert_counts": [a['c'] for a in alert_series],
+        "correctness_labels": correctness_labels,
+        "correctness_counts": correctness_counts,
+        "rating_labels": [f"{r['solution_rating']} Star(s)" for r in ratings_series],
+        "rating_counts": [r['c'] for r in ratings_series],
+        "agent_labels": [a['assigned_agent'] for a in agent_series],
+        "agent_counts": [a['c'] for a in agent_series],
+    }
+    print(f"2. Chart Data Assembled: {chart_data}")
 
-    # --- Tickets by alert type (top 10) ---
-    by_alert = (
-        Ticket.objects.values("alert_type")
-        .annotate(c=Count("id"))
-        .order_by("-c")[:10]
-    )
-    alert_labels = [row["alert_type"] or "Unknown" for row in by_alert]
-    alert_counts = [row["c"] for row in by_alert]
-
-    # --- Solution correctness (based on resolution_feedback) ---
-    correctness = Ticket.objects.aggregate(
-        correct=Count(Case(When(resolution_feedback__iexact="correct", then=1))),
-        wrong=Count(Case(When(~Q(resolution_feedback__iexact="correct") &
-                              Q(resolution_feedback__isnull=False), then=1))),
-        unknown=Count(Case(When(resolution_feedback__isnull=True, then=1))),
-    )
-    correctness_labels = ["Correct", "Wrong", "Unknown"]
-    correctness_counts = [
-        correctness["correct"] or 0,
-        correctness["wrong"] or 0,
-        correctness["unknown"] or 0,
-    ]
-
-    # --- Ratings distribution (1..5) ---
-    rating_buckets = (
-        Ticket.objects
-        .filter(solution_rating__isnull=False)
-        .values("solution_rating")
-        .annotate(c=Count("id"))
-        .order_by("solution_rating")
-    )
-    rating_map = {row["solution_rating"]: row["c"] for row in rating_buckets}
-    rating_labels = [1, 2, 3, 4, 5]
-    rating_counts = [rating_map.get(i, 0) for i in rating_labels]
-
-    # --- Agent workload (top 10) ---
-    by_agent = (
-        Ticket.objects.values("assigned_agent")
-        .annotate(
-            open=Count(Case(When(~Q(status__in=["Resolved", "Closed"]), then=1))),
-            total=Count("id"),
-        )
-        .order_by("-total")[:10]
-    )
-    agent_labels = [row["assigned_agent"] or "Unassigned" for row in by_agent]
-    agent_totals = [row["total"] for row in by_agent]
-    agent_opens = [row["open"] for row in by_agent]
-
-    context = admin.site.each_context(request)
-    context.update(
-        kpis={
-            "total": total_tickets,
-            "open": open_tickets,
-            "unsolved": unsolved_tickets,
-            "today": todays_tickets,
-            "avg_rating": round(avg_rating, 2),
-        },
-        charts={
-            "days": json.dumps(days),
-            "day_counts": json.dumps(day_counts),
-            "status_labels": json.dumps(status_labels),
-            "status_counts": json.dumps(status_counts),
-            "alert_labels": json.dumps(alert_labels),
-            "alert_counts": json.dumps(alert_counts),
-            "correctness_labels": json.dumps(correctness_labels),
-            "correctness_counts": json.dumps(correctness_counts),
-            "rating_labels": json.dumps(rating_labels),
-            "rating_counts": json.dumps(rating_counts),
-            "agent_labels": json.dumps(agent_labels),
-            "agent_totals": json.dumps(agent_totals),
-            "agent_opens": json.dumps(agent_opens),
-        },
-    )
+    context = {
+        'kpis': kpis,
+        'chart_data': chart_data,
+    }
+    print("--- REPORTING VIEW: DATA CALCULATION COMPLETE ---")
     return render(request, "admin/reporting_dashboard.html", context)
