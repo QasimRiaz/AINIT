@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -154,6 +154,36 @@
 
         .nav-links a:hover::after {
             width: 100%;
+        }
+
+        /* Language switcher */
+
+        .lang-switch {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        .lang-btn {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            padding: 0.2rem 0.7rem;
+            cursor: pointer;
+            transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(148, 163, 184, 0.9);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #2563eb, #22c55e);
+            color: #f9fafb;
+            border-color: transparent;
         }
 
         /* Buttons */
@@ -869,12 +899,18 @@
                 <span>NexusAI</span>
             </a>
             <nav class="nav-links">
-                <a href="#problem">Why NexusAI</a>
-                <a href="#solution">Platform</a>
-                <a href="#how">How it works</a>
-                <a href="#expertise">Expertise</a>
-                <a href="#customers">Customers</a>
-                <a href="{% url 'admin:index' %}" class="btn btn-sm btn-outline">Client Login</a>
+                <a id="nav-why" href="#problem">Why NexusAI</a>
+                <a id="nav-platform" href="#solution">Platform</a>
+                <a id="nav-how" href="#how">How it works</a>
+                <a id="nav-expertise" href="#expertise">Expertise</a>
+                <a id="nav-customers" href="#customers">Customers</a>
+
+                <div class="lang-switch">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ar">العربية</button>
+                </div>
+
+                <a id="nav-login-btn" href="{% url 'admin:index' %}" class="btn btn-sm btn-outline">Client Login</a>
             </nav>
         </div>
     </header>
@@ -886,33 +922,33 @@
                 <div class="fade-in-up">
                     <div class="badge">
                         <span class="badge-dot"></span>
-                        <span>AI-first network monitoring & ticketing</span>
+                        <span id="badge-text">AI-first network monitoring &amp; ticketing</span>
                     </div>
-                    <h1>
+                    <h1 id="hero-title">
                         Intelligent <span class="hero-highlight">Network Operations</span>
                         without the alert fatigue.
                     </h1>
-                    <p class="hero-sub">
+                    <p id="hero-sub" class="hero-sub">
                         NexusAI watches your network, triages alerts, opens and updates tickets,
                         and proposes or executes fixes automatically. Your engineers stay in control,
                         without living in dashboards all day.
                     </p>
                     <div class="hero-actions">
-                        <a href="#cta" class="btn btn-primary">
+                        <a id="hero-primary-cta" href="#cta" class="btn btn-primary">
                             Book a demo
                         </a>
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline">
+                        <a id="hero-secondary-cta" href="{% url 'admin:index' %}" class="btn btn-outline">
                             Client portal
                         </a>
                     </div>
                     <div class="hero-meta">
                         <span>
-                            <strong>60% fewer incidents</strong>
-                            MTTR reduced in the first 90 days for typical customers.
+                            <strong id="hero-meta1-strong">60% fewer incidents</strong>
+                            <span id="hero-meta1-text">MTTR reduced in the first 90 days for typical customers.</span>
                         </span>
                         <span>
-                            <strong>AI + Human-in-the-loop</strong>
-                            Automations that propose actions before they execute.
+                            <strong id="hero-meta2-strong">AI + Human-in-the-loop</strong>
+                            <span id="hero-meta2-text">Automations that propose actions before they execute.</span>
                         </span>
                     </div>
                 </div>
@@ -951,7 +987,7 @@
                         <div class="hero-timeline">
                             <div class="hero-timeline-step">
                                 <span class="hero-timeline-title">Detect</span>
-                                <span class="muted">PRTG & Syslog burst in DC-2</span>
+                                <span class="muted">PRTG &amp; Syslog burst in DC-2</span>
                             </div>
                             <div class="hero-timeline-step">
                                 <span class="hero-timeline-title">Diagnose</span>
@@ -971,9 +1007,9 @@
         <section id="problem" class="problem">
             <div class="container problem-grid">
                 <div class="fade-in-up">
-                    <span class="section-pill">The problem</span>
-                    <h2>Alert storms, siloed tools, and slow root-cause analysis.</h2>
-                    <p class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
+                    <span id="problem-pill" class="section-pill">The problem</span>
+                    <h2 id="problem-title">Alert storms, siloed tools, and slow root-cause analysis.</h2>
+                    <p id="problem-text" class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
                         Modern networks generate millions of signals. NOCs and SRE teams spend their time
                         clearing false positives, copy-pasting data into tickets, and guessing which device
                         actually caused the impact.
@@ -981,19 +1017,19 @@
                     <ul class="problem-points">
                         <li>
                             <span class="problem-dot"></span>
-                            <span>PRTG, SNMP traps, NetFlow, and cloud metrics all speak different languages.</span>
+                            <span id="problem-li-1">PRTG, SNMP traps, NetFlow, and cloud metrics all speak different languages.</span>
                         </li>
                         <li>
                             <span class="problem-dot"></span>
-                            <span>Critical insights are buried in chat threads and historic tickets.</span>
+                            <span id="problem-li-2">Critical insights are buried in chat threads and historic tickets.</span>
                         </li>
                         <li>
                             <span class="problem-dot"></span>
-                            <span>Runbooks live in wikis no one opens during an incident.</span>
+                            <span id="problem-li-3">Runbooks live in wikis no one opens during an incident.</span>
                         </li>
                         <li>
                             <span class="problem-dot"></span>
-                            <span>Human context is needed, but engineers are overloaded.</span>
+                            <span id="problem-li-4">Human context is needed, but engineers are overloaded.</span>
                         </li>
                     </ul>
                 </div>
@@ -1010,7 +1046,7 @@
                         <div class="log-line">
                             <span>[00:01] PRTG</span>
                             <span class="log-level log-level-error">CRIT</span>
-                            <span>Packet loss > 60% between HQ ↔ EU POP</span>
+                            <span>Packet loss &gt; 60% between HQ ↔ EU POP</span>
                         </div>
                         <div class="log-line">
                             <span>[00:02] SNMP</span>
@@ -1041,9 +1077,9 @@
         <section id="solution" class="solution">
             <div class="container">
                 <div class="section-header fade-in-up">
-                    <span class="section-pill">The NexusAI platform</span>
-                    <h2>From raw alerts to resolved tickets, with AI in the loop.</h2>
-                    <p>
+                    <span id="solution-pill" class="section-pill">The NexusAI platform</span>
+                    <h2 id="solution-title">From raw alerts to resolved tickets, with AI in the loop.</h2>
+                    <p id="solution-text">
                         NexusAI connects to your existing monitoring and ITSM tools, builds a live
                         knowledge graph of your network, and drives targeted automation where it is safe
                         and effective.
@@ -1053,38 +1089,38 @@
                 <div class="feature-grid">
                     <article class="feature-card fade-in-up delay-1">
                         <div class="feature-icon">🤖</div>
-                        <h3>AI-powered diagnostics</h3>
-                        <p>
+                        <h3 id="feat1-title">AI-powered diagnostics</h3>
+                        <p id="feat1-body">
                             Agentic LLM workflows read PRTG alerts, SNMP traps, logs, and topology data in real time.
                             NexusAI asks clarifying questions, runs checks, and narrows down the root cause like a
                             senior network engineer.
                         </p>
-                        <div class="feature-tagline">Triage thousands of alerts into a handful of actionable incidents.</div>
+                        <div id="feat1-tagline" class="feature-tagline">Triage thousands of alerts into a handful of actionable incidents.</div>
                     </article>
 
                     <article class="feature-card fade-in-up delay-2">
                         <div class="feature-icon" style="background:radial-gradient(circle at 30% 0,#a855f7,#4c1d95);box-shadow:0 8px 20px rgba(168,85,247,0.6);">
                             📚
                         </div>
-                        <h3>Self-improving knowledge graph</h3>
-                        <p>
+                        <h3 id="feat2-title">Self-improving knowledge graph</h3>
+                        <p id="feat2-body">
                             Every ticket, chat transcript, and change request is indexed into a semantic knowledge base.
                             NexusAI learns which fixes actually worked and reuses them as playbooks for future incidents.
                         </p>
-                        <div class="feature-tagline">Your operational memory, searchable and reusable in seconds.</div>
+                        <div id="feat2-tagline" class="feature-tagline">Your operational memory, searchable and reusable in seconds.</div>
                     </article>
 
                     <article class="feature-card fade-in-up delay-3">
                         <div class="feature-icon" style="background:radial-gradient(circle at 30% 0,#22c55e,#15803d);box-shadow:0 8px 20px rgba(34,197,94,0.6);">
                             ⚡
                         </div>
-                        <h3>Safe, closed-loop automation</h3>
-                        <p>
+                        <h3 id="feat3-title">Safe, closed-loop automation</h3>
+                        <p id="feat3-body">
                             From creating and updating tickets to executing changes on routers, firewalls, and cloud,
                             NexusAI can either propose actions for approval or run fully automated workflows
                             with guardrails.
                         </p>
-                        <div class="feature-tagline">Keep humans in control while eliminating repetitive toil.</div>
+                        <div id="feat3-tagline" class="feature-tagline">Keep humans in control while eliminating repetitive toil.</div>
                     </article>
                 </div>
             </div>
@@ -1094,9 +1130,9 @@
         <section id="how">
             <div class="container how-grid">
                 <div class="fade-in-up">
-                    <span class="section-pill">How it works</span>
-                    <h2>Plug into your stack. Start resolving incidents on day one.</h2>
-                    <p class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
+                    <span id="how-pill" class="section-pill">How it works</span>
+                    <h2 id="how-title">Plug into your stack. Start resolving incidents on day one.</h2>
+                    <p id="how-text" class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
                         NexusAI is designed for modern network and SRE teams. No rip-and-replace, no complicated
                         rule engines to maintain.
                     </p>
@@ -1105,8 +1141,8 @@
                         <div class="step">
                             <div class="step-index">1</div>
                             <div>
-                                <h4>Connect monitoring & ITSM</h4>
-                                <p>
+                                <h4 id="step1-title">Connect monitoring &amp; ITSM</h4>
+                                <p id="step1-body">
                                     Ingest alerts from PRTG, SNMP/WMI, NetFlow, cloud metrics, and logs.
                                     Sync incidents and changes with your ticketing system (ServiceNow, Jira Service
                                     Management, Zendesk, and more).
@@ -1117,8 +1153,8 @@
                         <div class="step">
                             <div class="step-index">2</div>
                             <div>
-                                <h4>Learn your environment</h4>
-                                <p>
+                                <h4 id="step2-title">Learn your environment</h4>
+                                <p id="step2-body">
                                     NexusAI discovers devices, dependencies, and historic incidents to build a
                                     topology-aware knowledge graph of your network and applications.
                                 </p>
@@ -1128,8 +1164,8 @@
                         <div class="step">
                             <div class="step-index">3</div>
                             <div>
-                                <h4>Automate with guardrails</h4>
-                                <p>
+                                <h4 id="step3-title">Automate with guardrails</h4>
+                                <p id="step3-body">
                                     Start with “recommendation mode” where every AI action requires human approval.
                                     Once you trust a playbook, flip it into full automation for specific sites, services,
                                     or incident types.
@@ -1142,34 +1178,34 @@
                 <aside class="how-card fade-in-up delay-2">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <div>
-                            <strong>Ticket lifecycle in NexusAI</strong>
-                            <p class="muted" style="font-size:0.78rem;margin-top:0.25rem;">
+                            <strong id="how-ticket-title">Ticket lifecycle in NexusAI</strong>
+                            <p id="how-ticket-sub" class="muted" style="font-size:0.78rem;margin-top:0.25rem;">
                                 Example: WAN latency degradation for remote offices
                             </p>
                         </div>
-                        <span class="how-pill">Automation coverage 72%</span>
+                        <span class="how-pill" id="how-coverage-pill">Automation coverage 72%</span>
                     </div>
 
                     <div class="how-rows">
                         <div class="how-row">
-                            <span>Detect & correlate</span>
-                            <span>Alerts grouped into INC-4310</span>
+                            <span id="how-row-1-label">Detect &amp; correlate</span>
+                            <span id="how-row-1-text">Alerts grouped into INC-4310</span>
                         </div>
                         <div class="how-row">
-                            <span>Diagnosis</span>
-                            <span>AI identifies QoS mis-match on WAN edge</span>
+                            <span id="how-row-2-label">Diagnosis</span>
+                            <span id="how-row-2-text">AI identifies QoS mis-match on WAN edge</span>
                         </div>
                         <div class="how-row">
-                            <span>Action proposal</span>
-                            <span>Rollback last policy · approval required</span>
+                            <span id="how-row-3-label">Action proposal</span>
+                            <span id="how-row-3-text">Rollback last policy · approval required</span>
                         </div>
                         <div class="how-row">
-                            <span>Execute change</span>
-                            <span>Config pushed to edge-gw-04 via secure pipeline</span>
+                            <span id="how-row-4-label">Execute change</span>
+                            <span id="how-row-4-text">Config pushed to edge-gw-04 via secure pipeline</span>
                         </div>
                         <div class="how-row">
-                            <span>Verify & close</span>
-                            <span>Metrics back to normal · ticket auto-updated</span>
+                            <span id="how-row-5-label">Verify &amp; close</span>
+                            <span id="how-row-5-text">Metrics back to normal · ticket auto-updated</span>
                         </div>
                     </div>
                 </aside>
@@ -1180,9 +1216,9 @@
         <section id="expertise" class="expertise">
             <div class="container">
                 <div class="section-header fade-in-up">
-                    <span class="section-pill">Deep networking expertise</span>
-                    <h2>Built with real-world network operations in mind.</h2>
-                    <p>
+                    <span id="expertise-pill" class="section-pill">Deep networking expertise</span>
+                    <h2 id="expertise-title">Built with real-world network operations in mind.</h2>
+                    <p id="expertise-text">
                         NexusAI combines large-scale LLMs with decades of hands-on experience operating
                         carrier-grade and enterprise networks.
                     </p>
@@ -1203,9 +1239,9 @@
         <section id="customers" class="customers">
             <div class="container">
                 <div class="section-header fade-in-up">
-                    <span class="section-pill">Trusted by teams who can’t go down</span>
-                    <h2>Designed for high-stakes networks.</h2>
-                    <p>
+                    <span id="customers-pill" class="section-pill">Trusted by teams who can’t go down</span>
+                    <h2 id="customers-title">Designed for high-stakes networks.</h2>
+                    <p id="customers-text">
                         NexusAI helps enterprises, service providers, and SaaS companies keep critical
                         connectivity healthy while shrinking their operational load.
                     </p>
@@ -1224,15 +1260,15 @@
             <div class="container">
                 <div class="cta-box fade-in-up">
                     <div>
-                        <h3 class="cta-title">See NexusAI on your own network.</h3>
-                        <p class="cta-sub">
+                        <h3 id="cta-title" class="cta-title">See NexusAI on your own network.</h3>
+                        <p id="cta-text" class="cta-sub">
                             Share a sample of your monitoring data and ticket exports, and we’ll show you
                             how much noise we can remove and what we’d automate first.
                         </p>
                     </div>
                     <div class="cta-actions">
-                        <a href="#top" class="btn btn-primary">Request a live demo</a>
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline">Existing customer login</a>
+                        <a id="cta-primary" href="#top" class="btn btn-primary">Request a live demo</a>
+                        <a id="cta-secondary" href="{% url 'admin:index' %}" class="btn btn-outline">Existing customer login</a>
                     </div>
                 </div>
             </div>
@@ -1244,9 +1280,208 @@
         <div class="container footer-inner">
             <span>&copy; {% now "Y" %} NexusAI. All rights reserved.</span>
             <span>
-                <a href="#top">Back to top</a>
+                <a id="footer-back-top" href="#top">Back to top</a>
             </span>
         </div>
     </footer>
+
+    <script>
+        const translations = {
+            en: {
+                "nav-why": "Why NexusAI",
+                "nav-platform": "Platform",
+                "nav-how": "How it works",
+                "nav-expertise": "Expertise",
+                "nav-customers": "Customers",
+                "nav-login-btn": "Client Login",
+
+                "badge-text": "AI-first network monitoring &amp; ticketing",
+                "hero-title": 'Intelligent <span class="hero-highlight">Network Operations</span> without the alert fatigue.',
+                "hero-sub": "NexusAI watches your network, triages alerts, opens and updates tickets, and proposes or executes fixes automatically. Your engineers stay in control, without living in dashboards all day.",
+                "hero-primary-cta": "Book a demo",
+                "hero-secondary-cta": "Client portal",
+                "hero-meta1-strong": "60% fewer incidents",
+                "hero-meta1-text": "MTTR reduced in the first 90 days for typical customers.",
+                "hero-meta2-strong": "AI + Human-in-the-loop",
+                "hero-meta2-text": "Automations that propose actions before they execute.",
+
+                "problem-pill": "The problem",
+                "problem-title": "Alert storms, siloed tools, and slow root-cause analysis.",
+                "problem-text": "Modern networks generate millions of signals. NOCs and SRE teams spend their time clearing false positives, copy-pasting data into tickets, and guessing which device actually caused the impact.",
+                "problem-li-1": "PRTG, SNMP traps, NetFlow, and cloud metrics all speak different languages.",
+                "problem-li-2": "Critical insights are buried in chat threads and historic tickets.",
+                "problem-li-3": "Runbooks live in wikis no one opens during an incident.",
+                "problem-li-4": "Human context is needed, but engineers are overloaded.",
+
+                "solution-pill": "The NexusAI platform",
+                "solution-title": "From raw alerts to resolved tickets, with AI in the loop.",
+                "solution-text": "NexusAI connects to your existing monitoring and ITSM tools, builds a live knowledge graph of your network, and drives targeted automation where it is safe and effective.",
+
+                "feat1-title": "AI-powered diagnostics",
+                "feat1-body": "Agentic LLM workflows read PRTG alerts, SNMP traps, logs, and topology data in real time. NexusAI asks clarifying questions, runs checks, and narrows down the root cause like a senior network engineer.",
+                "feat1-tagline": "Triage thousands of alerts into a handful of actionable incidents.",
+
+                "feat2-title": "Self-improving knowledge graph",
+                "feat2-body": "Every ticket, chat transcript, and change request is indexed into a semantic knowledge base. NexusAI learns which fixes actually worked and reuses them as playbooks for future incidents.",
+                "feat2-tagline": "Your operational memory, searchable and reusable in seconds.",
+
+                "feat3-title": "Safe, closed-loop automation",
+                "feat3-body": "From creating and updating tickets to executing changes on routers, firewalls, and cloud, NexusAI can either propose actions for approval or run fully automated workflows with guardrails.",
+                "feat3-tagline": "Keep humans in control while eliminating repetitive toil.",
+
+                "how-pill": "How it works",
+                "how-title": "Plug into your stack. Start resolving incidents on day one.",
+                "how-text": "NexusAI is designed for modern network and SRE teams. No rip-and-replace, no complicated rule engines to maintain.",
+
+                "step1-title": "Connect monitoring &amp; ITSM",
+                "step1-body": "Ingest alerts from PRTG, SNMP/WMI, NetFlow, cloud metrics, and logs. Sync incidents and changes with your ticketing system (ServiceNow, Jira Service Management, Zendesk, and more).",
+
+                "step2-title": "Learn your environment",
+                "step2-body": "NexusAI discovers devices, dependencies, and historic incidents to build a topology-aware knowledge graph of your network and applications.",
+
+                "step3-title": "Automate with guardrails",
+                "step3-body": "Start with “recommendation mode” where every AI action requires human approval. Once you trust a playbook, flip it into full automation for specific sites, services, or incident types.",
+
+                "how-ticket-title": "Ticket lifecycle in NexusAI",
+                "how-ticket-sub": "Example: WAN latency degradation for remote offices",
+                "how-coverage-pill": "Automation coverage 72%",
+                "how-row-1-label": "Detect &amp; correlate",
+                "how-row-1-text": "Alerts grouped into INC-4310",
+                "how-row-2-label": "Diagnosis",
+                "how-row-2-text": "AI identifies QoS mis-match on WAN edge",
+                "how-row-3-label": "Action proposal",
+                "how-row-3-text": "Rollback last policy · approval required",
+                "how-row-4-label": "Execute change",
+                "how-row-4-text": "Config pushed to edge-gw-04 via secure pipeline",
+                "how-row-5-label": "Verify &amp; close",
+                "how-row-5-text": "Metrics back to normal · ticket auto-updated",
+
+                "expertise-pill": "Deep networking expertise",
+                "expertise-title": "Built with real-world network operations in mind.",
+                "expertise-text": "NexusAI combines large-scale LLMs with decades of hands-on experience operating carrier-grade and enterprise networks.",
+
+                "customers-pill": "Trusted by teams who can’t go down",
+                "customers-title": "Designed for high-stakes networks.",
+                "customers-text": "NexusAI helps enterprises, service providers, and SaaS companies keep critical connectivity healthy while shrinking their operational load.",
+
+                "cta-title": "See NexusAI on your own network.",
+                "cta-text": "Share a sample of your monitoring data and ticket exports, and we’ll show you how much noise we can remove and what we’d automate first.",
+                "cta-primary": "Request a live demo",
+                "cta-secondary": "Existing customer login",
+
+                "footer-back-top": "Back to top"
+            },
+            ar: {
+                "nav-why": "لماذا NexusAI",
+                "nav-platform": "المنصّة",
+                "nav-how": "آلية العمل",
+                "nav-expertise": "الخبرات",
+                "nav-customers": "العملاء",
+                "nav-login-btn": "تسجيل دخول العملاء",
+
+                "badge-text": "مراقبة الشبكة وإدارة التذاكر بالذكاء الاصطناعي أولاً",
+                "hero-title": 'عمليات <span class="hero-highlight">شبكات ذكية</span> بدون إرهاق التنبيهات.',
+                "hero-sub": "تراقب NexusAI شبكتك، وتفرز التنبيهات، وتفتح التذاكر وتحدّثها، وتقترح أو تنفّذ الإصلاحات تلقائياً. يبقى مهندسو الشبكة متحكمين بكل شيء بدون أن يقضوا يومهم داخل لوحات المتابعة.",
+                "hero-primary-cta": "احجز عرضاً توضيحياً",
+                "hero-secondary-cta": "بوابة العملاء",
+                "hero-meta1-strong": "انخفاض الحوادث بنسبة 60٪",
+                "hero-meta1-text": "تقليل متوسط زمن الحل (MTTR) خلال أول 90 يوماً لعملائنا النموذجيين.",
+                "hero-meta2-strong": "ذكاء اصطناعي + إشراف بشري",
+                "hero-meta2-text": "أتمتة تقترح الإجراءات قبل تنفيذها.",
+
+                "problem-pill": "المشكلة",
+                "problem-title": "عواصف تنبيهات، وأدوات معزولة، وتحليل بطيء لجذور الأعطال.",
+                "problem-text": "تولّد الشبكات الحديثة ملايين الإشارات. تقضي فرق مراكز التشغيل وفرق الموثوقية (SRE) وقتها في تنظيف التنبيهات الخاطئة، ونسخ البيانات إلى التذاكر، ومحاولة تخمين أي جهاز تسبّب فعلاً في التأثير.",
+                "problem-li-1": "تعمل PRTG وتنبيهات SNMP وNetFlow ومقاييس السحابة بلغات مختلفة.",
+                "problem-li-2": "المعلومات الحرجة مدفونة داخل محادثات الدردشة والتذاكر القديمة.",
+                "problem-li-3": "إجراءات التشغيل الموحّدة تعيش في صفحات الويكي التي لا يفتحها أحد أثناء الحوادث.",
+                "problem-li-4": "السياق البشري ضروري، لكن المهندسين مثقلون بالمهام.",
+
+                "solution-pill": "منصّة NexusAI",
+                "solution-title": "من التنبيهات الخام إلى التذاكر المحلولة، مع ذكاء اصطناعي في الحلقة.",
+                "solution-text": "تتصل NexusAI بأدوات المراقبة وإدارة الخدمات الموجودة لديك، وتبني رسماً بيانياً حياً لمعرفتك الشبكية، وتدفع الأتمتة الموجَّهة حيثما كانت آمنة وفعّالة.",
+
+                "feat1-title": "تشخيص مدعوم بالذكاء الاصطناعي",
+                "feat1-body": "تقرأ سير عمل النماذج اللغوية العاملية تنبيهات PRTG وSNMP والسجلات وبيانات topology في الزمن الحقيقي. تطرح NexusAI أسئلة إيضاحية، وتجري الفحوصات، وتضيّق دائرة السبب الجذري كما يفعل مهندس شبكات خبير.",
+                "feat1-tagline": "حوّل آلاف التنبيهات إلى حفنة من الحوادث القابلة للتنفيذ.",
+
+                "feat2-title": "رسم بياني معرفي يتعلّم ذاتياً",
+                "feat2-body": "يتم فهرسة كل تذكرة، وكل محادثة، وكل طلب تغيير في قاعدة معرفة دلالية. تتعلّم NexusAI أي الإصلاحات نجحت فعلاً وتعيد استخدامها كخطط جاهزة للحوادث المستقبلية.",
+                "feat2-tagline": "ذاكرتك التشغيلية، قابلة للبحث وإعادة الاستخدام في ثوانٍ.",
+
+                "feat3-title": "أتمتة آمنة مغلقة الحلقة",
+                "feat3-body": "من إنشاء التذاكر وتحديثها إلى تنفيذ التغييرات على الموجّهات وجدران الحماية والسحابة، يمكن لـ NexusAI أن تقترح الإجراءات للموافقة أو تنفّذ مسارات عمل كاملة تلقائياً مع حواجز أمان.",
+                "feat3-tagline": "أبقِ البشر في موضع التحكم، وتخلّص من الأعمال الروتينية المتكررة.",
+
+                "how-pill": "آلية العمل",
+                "how-title": "اتصل بباقتك التقنية وابدأ بحل الحوادث من اليوم الأول.",
+                "how-text": "صُمِّمت NexusAI لفرق الشبكات وSRE الحديثة. لا حاجة لاستبدال الأنظمة الحالية ولا لإدارة محركات قواعد معقّدة.",
+
+                "step1-title": "ربط أنظمة المراقبة و ITSM",
+                "step1-body": "استقبل التنبيهات من PRTG وSNMP/WMI وNetFlow ومقاييس السحابة والسجلات. وازن الحوادث والتغييرات مع نظام التذاكر لديك (ServiceNow وJira Service Management وZendesk وغيرها).",
+
+                "step2-title": "التعرّف على بيئتك",
+                "step2-body": "تكتشف NexusAI الأجهزة والاعتمادية والحوادث التاريخية لتبني رسماً بيانياً واعياً بالـ topology لشبكتك وتطبيقاتك.",
+
+                "step3-title": "أتمتة مع حواجز أمان",
+                "step3-body": "ابدأ بوضع \"وضع التوصية\" حيث يتطلّب كل إجراء من الذكاء الاصطناعي موافقة بشرية. وعندما تثق بخطة ما، فعِّل الأتمتة الكاملة لمواقع أو خدمات أو أنواع حوادث محددة.",
+
+                "how-ticket-title": "دورة حياة التذكرة داخل NexusAI",
+                "how-ticket-sub": "مثال: تدهور زمن الاستجابة عبر الـ WAN للفروع البعيدة",
+                "how-coverage-pill": "تغطية الأتمتة 72٪",
+                "how-row-1-label": "الاكتشاف والارتباط",
+                "how-row-1-text": "تجميع التنبيهات في الحادث INC-4310",
+                "how-row-2-label": "التشخيص",
+                "how-row-2-text": "تعرّف الذكاء الاصطناعي على اختلاف في سياسة QoS على حافة الـ WAN",
+                "how-row-3-label": "اقتراح الإجراء",
+                "how-row-3-text": "التراجع عن آخر سياسة · يتطلّب موافقة",
+                "how-row-4-label": "تنفيذ التغيير",
+                "how-row-4-text": "دفع الإعدادات إلى edge-gw-04 عبر قناة آمنة",
+                "how-row-5-label": "التحقق والإغلاق",
+                "how-row-5-text": "عودة المقاييس إلى الوضع الطبيعي · تحديث التذكرة تلقائياً",
+
+                "expertise-pill": "خبرة شبكات عميقة",
+                "expertise-title": "مبنية لعمليات شبكات حقيقية.",
+                "expertise-text": "تجمع NexusAI بين نماذج لغوية واسعة النطاق وعقود من الخبرة العملية في تشغيل شبكات مزوّدي الخدمة والمؤسسات.",
+
+                "customers-pill": "موثوق بها في البيئات التي لا تحتمل التوقّف",
+                "customers-title": "مصمّمة للشبكات عالية الحساسية.",
+                "customers-text": "تساعد NexusAI الشركات والمؤسسات ومزوّدي الخدمات وشركات SaaS على الحفاظ على الاتصال الحرج بصحة جيدة مع تقليل العبء التشغيلي.",
+
+                "cta-title": "شاهد NexusAI على شبكتك أنت.",
+                "cta-text": "أرسل عينة من بيانات المراقبة وتصدير التذاكر لديك، وسنوضح لك مقدار الضجيج الذي يمكننا إزالته وما الذي سنقوم بأتمتته أولاً.",
+                "cta-primary": "اطلب عرضاً مباشراً",
+                "cta-secondary": "تسجيل دخول العملاء الحاليين",
+
+                "footer-back-top": "العودة للأعلى"
+            }
+        };
+
+        function setLanguage(lang) {
+            const dict = translations[lang] || translations.en;
+
+            Object.keys(dict).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = dict[id];
+                }
+            });
+
+            document.documentElement.lang = lang === "ar" ? "ar" : "en";
+            document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+
+            document.querySelectorAll(".lang-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.lang === lang);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".lang-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    setLanguage(btn.dataset.lang);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
