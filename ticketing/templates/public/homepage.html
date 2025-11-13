@@ -3,216 +3,1250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusAI - Intelligent Network Automation</title>
+    <title>NexusAI – Intelligent Network Operations</title>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- Basic Setup & Fonts --- */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
-        
         :root {
-            --primary-dark: #2c3e50;
-            --secondary-dark: #34495e;
-            --accent-teal: #1abc9c;
-            --light-grey: #ecf0f1;
-            --text-color: #333;
+            --bg-body: #050816;
+            --primary: #2563eb;
+            --primary-soft: rgba(37, 99, 235, 0.12);
+            --accent: #22c55e;
+            --accent-soft: rgba(34, 197, 94, 0.12);
+            --accent-purple: #a855f7;
+            --card-bg: #0b1120;
+            --card-border: rgba(148, 163, 184, 0.24);
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --chip-bg: rgba(148, 163, 184, 0.16);
+            --nav-bg: rgba(15, 23, 42, 0.85);
+            --shadow-soft: 0 22px 35px rgba(15, 23, 42, 0.65);
+            --radius-lg: 18px;
+            --radius-pill: 1000px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
             margin: 0;
-            color: var(--text-color);
-            background-color: #fdfdfd;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 55%),
+                radial-gradient(circle at top right, rgba(94, 234, 212, 0.18), transparent 55%),
+                radial-gradient(circle at bottom, rgba(129, 140, 248, 0.24), transparent 55%),
+                var(--bg-body);
+            color: var(--text-main);
             line-height: 1.6;
         }
 
-        /* --- General Styling --- */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Layout helpers */
+
         .container {
-            max-width: 1100px;
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        h1, h2, h3 {
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            padding: 0 1.5rem;
         }
 
         section {
-            padding: 4rem 0;
+            padding: 5rem 0;
         }
+
+        h1, h2, h3, h4 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .muted {
+            color: var(--text-muted);
+        }
+
+        /* Top nav */
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            background: linear-gradient(to bottom, var(--nav-bg), transparent);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .brand-mark {
+            width: 28px;
+            height: 28px;
+            border-radius: 11px;
+            background: conic-gradient(from 160deg, #38bdf8, #22c55e, #a855f7, #38bdf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.8);
+        }
+
+        .brand-mark span {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0b1120;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 0.2rem;
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #38bdf8, #22c55e);
+            transition: width 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            color: #e5e7eb;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Buttons */
 
         .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background-color: var(--accent-teal);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 700;
-            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.8rem 1.4rem;
+            border-radius: var(--radius-pill);
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.18s ease, border-color 0.18s ease;
+            white-space: nowrap;
         }
 
-        .btn:hover {
-            background-color: #16a085;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #22c55e);
+            color: #f9fafb;
+            box-shadow: 0 18px 35px rgba(37, 99, 235, 0.5);
         }
 
-        /* --- Header & Hero Section --- */
-        .header {
-            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('https://www.prtg.com/sites/default/files/2023-01/prtg-documentation-discover-your-network.webp') no-repeat center center/cover;
-            color: #fff;
-            padding: 6rem 0;
+        .btn-primary:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 22px 40px rgba(15, 23, 42, 0.85);
+        }
+
+        .btn-outline {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(148, 163, 184, 0.4);
+            color: #e5e7eb;
+        }
+
+        .btn-outline:hover {
+            border-color: rgba(148, 163, 184, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1.05rem;
+            font-size: 0.8rem;
+        }
+
+        /* Hero */
+
+        .hero {
+            padding: 5rem 0 4rem;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+            gap: 3.2rem;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.35rem 0.2rem 0.2rem;
+            border-radius: var(--radius-pill);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            margin-bottom: 1.2rem;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.28);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.4rem, 4vw, 3.2rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero-highlight {
+            background: linear-gradient(120deg, #38bdf8, #22c55e, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            max-width: 32rem;
+            margin-bottom: 1.7rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 0.9rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.6rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .hero-meta span strong {
+            display: block;
+            color: #e5e7eb;
+            font-size: 1rem;
+        }
+
+        .hero-card {
+            position: relative;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.28), transparent 55%), var(--card-bg);
+            border-radius: 26px;
+            padding: 1.7rem 1.6rem 1.5rem;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            min-height: 260px;
+        }
+
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background:
+                radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.16), transparent 55%),
+                radial-gradient(circle at 100% 30%, rgba(34, 197, 94, 0.16), transparent 55%),
+                radial-gradient(circle at 20% 100%, rgba(129, 140, 248, 0.14), transparent 55%);
+            opacity: 0.65;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        .hero-card-inner {
+            position: relative;
+        }
+
+        .hero-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hero-chip {
+            padding: 0.3rem 0.7rem;
+            border-radius: var(--radius-pill);
+            font-size: 0.7rem;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.78rem;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 16px;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card span {
+            display: block;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .metric-value {
+            margin-top: 0.15rem;
+            font-weight: 600;
+        }
+
+        .metric-positive {
+            color: #22c55e;
+        }
+
+        .metric-pill {
+            position: absolute;
+            right: 0.6rem;
+            bottom: 0.5rem;
+            font-size: 0.65rem;
+            padding: 0.12rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+        }
+
+        .hero-timeline {
+            display: flex;
+            gap: 0.65rem;
+            margin-top: 0.9rem;
+            font-size: 0.72rem;
+        }
+
+        .hero-timeline-step {
+            flex: 1;
+            padding: 0.55rem 0.6rem;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .hero-timeline-step span {
+            display: block;
+        }
+
+        .hero-timeline-title {
+            font-weight: 500;
+            margin-bottom: 0.05rem;
+        }
+
+        /* Sections */
+
+        .section-header {
+            max-width: 620px;
+            margin: 0 auto 3rem;
             text-align: center;
         }
-        .header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            color: #fff;
-        }
-        .header p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-        .header .brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #fff;
+
+        .section-pill {
+            display: inline-flex;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-pill);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            color: var(--text-muted);
+            margin-bottom: 1.15rem;
         }
 
-        /* --- Feature Section --- */
-        .features-grid {
+        .section-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Problem section */
+
+        .problem {
+            padding-top: 0;
+        }
+
+        .problem-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        .feature-card {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            text-align: left;
-        }
-        .feature-card h3 {
-            font-size: 1.5rem;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+            gap: 2.8rem;
+            align-items: center;
         }
 
-        /* --- Expertise & Logos Section --- */
-        #expertise, #customers {
-            background-color: var(--light-grey);
+        .problem-points {
+            list-style: none;
+            padding: 0;
+            margin: 1.4rem 0 0;
         }
-        .expertise-list {
+
+        .problem-points li {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .problem-dot {
+            margin-top: 0.25rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, #22c55e, #1d4ed8);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+            flex-shrink: 0;
+        }
+
+        .problem-panel {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 22px;
+            padding: 1.4rem 1.5rem 1.3rem;
+            border: 1px solid rgba(248, 250, 252, 0.04);
+            box-shadow: 0 20px 30px rgba(15, 23, 42, 0.9);
+        }
+
+        .problem-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.9rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .problem-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .problem-tag {
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 1);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            font-size: 0.7rem;
+        }
+
+        .problem-log {
+            background: rgba(15, 23, 42, 1);
+            border-radius: 14px;
+            padding: 0.8rem 0.9rem;
+            font-size: 0.72rem;
+            max-height: 160px;
+            overflow: hidden;
+        }
+
+        .log-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-muted);
+        }
+
+        .log-level {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            background: rgba(248, 250, 252, 0.04);
+        }
+
+        .log-level-error {
+            color: #fecaca;
+            border: 1px solid rgba(248, 113, 113, 0.5);
+        }
+
+        .log-level-info {
+            color: #bfdbfe;
+            border: 1px solid rgba(96, 165, 250, 0.5);
+        }
+
+        .log-level-ai {
+            color: #bbf7d0;
+            border: 1px solid rgba(34, 197, 94, 0.55);
+        }
+
+        /* Solution / features */
+
+        .solution {
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.96));
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.7rem;
+        }
+
+        .feature-card {
+            position: relative;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 1.4rem 1.45rem;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.85);
+            overflow: hidden;
+            transform-origin: center top;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.14), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.18s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 26px 42px rgba(15, 23, 42, 0.95);
+            border-color: rgba(56, 189, 248, 0.6);
+            background: rgba(15, 23, 42, 0.98);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            background: radial-gradient(circle at 30% 0, #38bdf8, #1e3a8a);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.6);
+            font-size: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 0.9rem;
+        }
+
+        .feature-tagline {
+            font-size: 0.76rem;
+            color: #bbf7d0;
+        }
+
+        /* How it works */
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: 2.2fr 1.4fr;
+            gap: 2.2rem;
+            align-items: flex-start;
+        }
+
+        .steps {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-index {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f9fafb;
+            background: radial-gradient(circle at 30% 0, #22c55e, #16a34a);
+            box-shadow: 0 10px 18px rgba(34, 197, 94, 0.5);
+            flex-shrink: 0;
+        }
+
+        .step h4 {
+            font-size: 0.98rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .step p {
+            font-size: 0.87rem;
+            color: var(--text-muted);
+        }
+
+        .how-card {
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 20px;
+            padding: 1.3rem 1.4rem 1.4rem;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: var(--shadow-soft);
+            font-size: 0.82rem;
+        }
+
+        .how-rows {
+            margin-top: 0.8rem;
+            border-radius: 14px;
+            background: #020617;
+            padding: 0.7rem;
+        }
+
+        .how-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .how-row + .how-row {
+            margin-top: 0.25rem;
+        }
+
+        .how-row span:first-child {
+            color: #e5e7eb;
+        }
+
+        .how-pill {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+        }
+
+        /* Expertise */
+
+        .expertise {
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            justify-content: center;
+        }
+
+        .chip {
+            padding: 0.5rem 0.9rem;
+            border-radius: var(--radius-pill);
+            background: var(--chip-bg);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            font-size: 0.82rem;
+        }
+
+        /* Customers */
+
+        .customers {
+            padding-top: 3.5rem;
+            padding-bottom: 4.5rem;
+        }
+
+        .logo-row {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        .expertise-item {
-            background-color: var(--secondary-dark);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 400;
-        }
-        .logos {
-            display: flex;
-            justify-content: space-around;
+            gap: 2.8rem;
             align-items: center;
-            filter: grayscale(100%) opacity(60%);
-            gap: 2rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            opacity: 0.75;
         }
 
-        /* --- Footer --- */
-        .footer {
-            background-color: var(--primary-dark);
-            color: #fff;
-            padding: 2rem;
-            text-align: center;
+        .logo-row span {
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        /* CTA */
+
+        .cta {
+            padding: 0 0 4.5rem;
+        }
+
+        .cta-box {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 1.6rem;
+            border-radius: 24px;
+            background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.32), transparent 55%), #020617;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.4rem;
+        }
+
+        .cta-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .cta-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+
+        footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            padding: 1.4rem 0 2rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        footer .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        footer a {
+            color: var(--text-muted);
+        }
+
+        /* Animation helpers */
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(18px);
+            animation: fadeInUp 0.7s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+            .hero-grid,
+            .problem-grid,
+            .how-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .hero-card {
+                order: -1;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 720px) {
+            section {
+                padding: 4rem 0;
+            }
+
+            .feature-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Hero Section -->
-    <header class="header">
-        <div class="brand">NexusAI</div>
-        <h1>Intelligent Automation for Your Network</h1>
-        <p>NexusAI leverages advanced AI to diagnose network issues in real-time, reducing downtime and freeing up your engineering team to focus on what matters most.</p>
-        <a href="{% url 'admin:index' %}" class="btn">Client Login</a>
+    <!-- Navigation -->
+    <header class="nav">
+        <div class="nav-inner">
+            <a href="#top" class="brand">
+                <div class="brand-mark"><span>N</span></div>
+                <span>NexusAI</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#problem">Why NexusAI</a>
+                <a href="#solution">Platform</a>
+                <a href="#how">How it works</a>
+                <a href="#expertise">Expertise</a>
+                <a href="#customers">Customers</a>
+                <a href="{% url 'admin:index' %}" class="btn btn-sm btn-outline">Client Login</a>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <!-- The Problem Section -->
-        <section id="problem" class="container">
-            <h2>Stop Chasing Alerts. Start Solving Problems.</h2>
-            <p style="max-width: 700px; margin: 0 auto;">Network complexity is at an all-time high. Your team is buried in alert noise from countless systems, struggling to manually correlate data and find the root cause. This leads to slow resolution times and critical business impact.</p>
+    <!-- Hero -->
+    <main id="top">
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="fade-in-up">
+                    <div class="badge">
+                        <span class="badge-dot"></span>
+                        <span>AI-first network monitoring & ticketing</span>
+                    </div>
+                    <h1>
+                        Intelligent <span class="hero-highlight">Network Operations</span>
+                        without the alert fatigue.
+                    </h1>
+                    <p class="hero-sub">
+                        NexusAI watches your network, triages alerts, opens and updates tickets,
+                        and proposes or executes fixes automatically. Your engineers stay in control,
+                        without living in dashboards all day.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#cta" class="btn btn-primary">
+                            Book a demo
+                        </a>
+                        <a href="{% url 'admin:index' %}" class="btn btn-outline">
+                            Client portal
+                        </a>
+                    </div>
+                    <div class="hero-meta">
+                        <span>
+                            <strong>60% fewer incidents</strong>
+                            MTTR reduced in the first 90 days for typical customers.
+                        </span>
+                        <span>
+                            <strong>AI + Human-in-the-loop</strong>
+                            Automations that propose actions before they execute.
+                        </span>
+                    </div>
+                </div>
+
+                <aside class="hero-card fade-in-up delay-2">
+                    <div class="hero-card-inner">
+                        <div class="hero-card-header">
+                            <div>
+                                <div class="hero-card-title">Live Operations Snapshot</div>
+                                <div class="muted" style="font-size:0.75rem;">Global fabric · Last 15 minutes</div>
+                            </div>
+                            <span class="hero-chip">AI copiloting on</span>
+                        </div>
+
+                        <div class="hero-metrics">
+                            <div class="metric-card">
+                                <span class="metric-label">Alert noise</span>
+                                <span class="metric-value metric-positive">-74%</span>
+                                <span class="metric-pill">Correlated</span>
+                            </div>
+                            <div class="metric-card">
+                                <span class="metric-label">Tickets auto-resolved</span>
+                                <span class="metric-value">38%</span>
+                                <span class="metric-pill">Playbooks</span>
+                            </div>
+                            <div class="metric-card">
+                                <span class="metric-label">MTTR (critical)</span>
+                                <span class="metric-value">8m 12s</span>
+                            </div>
+                            <div class="metric-card">
+                                <span class="metric-label">Changes executed</span>
+                                <span class="metric-value">27</span>
+                            </div>
+                        </div>
+
+                        <div class="hero-timeline">
+                            <div class="hero-timeline-step">
+                                <span class="hero-timeline-title">Detect</span>
+                                <span class="muted">PRTG & Syslog burst in DC-2</span>
+                            </div>
+                            <div class="hero-timeline-step">
+                                <span class="hero-timeline-title">Diagnose</span>
+                                <span class="muted">Root cause: BGP flap on edge-gw-04</span>
+                            </div>
+                            <div class="hero-timeline-step">
+                                <span class="hero-timeline-title">Act</span>
+                                <span class="muted">Rollback route-map · Ticket #4310</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </section>
 
-        <!-- The Solution Section -->
-        <section id="solution" style="background: #fff;">
+        <!-- Problem -->
+        <section id="problem" class="problem">
+            <div class="container problem-grid">
+                <div class="fade-in-up">
+                    <span class="section-pill">The problem</span>
+                    <h2>Alert storms, siloed tools, and slow root-cause analysis.</h2>
+                    <p class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
+                        Modern networks generate millions of signals. NOCs and SRE teams spend their time
+                        clearing false positives, copy-pasting data into tickets, and guessing which device
+                        actually caused the impact.
+                    </p>
+                    <ul class="problem-points">
+                        <li>
+                            <span class="problem-dot"></span>
+                            <span>PRTG, SNMP traps, NetFlow, and cloud metrics all speak different languages.</span>
+                        </li>
+                        <li>
+                            <span class="problem-dot"></span>
+                            <span>Critical insights are buried in chat threads and historic tickets.</span>
+                        </li>
+                        <li>
+                            <span class="problem-dot"></span>
+                            <span>Runbooks live in wikis no one opens during an incident.</span>
+                        </li>
+                        <li>
+                            <span class="problem-dot"></span>
+                            <span>Human context is needed, but engineers are overloaded.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <aside class="problem-panel fade-in-up delay-2">
+                    <div class="problem-panel-header">
+                        <span>War-room view</span>
+                        <div class="problem-tags">
+                            <span class="problem-tag">NexusAI Inference</span>
+                            <span class="problem-tag">Live incident #4310</span>
+                        </div>
+                    </div>
+                    <div class="problem-log">
+                        <div class="log-line">
+                            <span>[00:01] PRTG</span>
+                            <span class="log-level log-level-error">CRIT</span>
+                            <span>Packet loss > 60% between HQ ↔ EU POP</span>
+                        </div>
+                        <div class="log-line">
+                            <span>[00:02] SNMP</span>
+                            <span class="log-level log-level-info">INFO</span>
+                            <span>Interface Gi0/1 on edge-gw-04 flapping</span>
+                        </div>
+                        <div class="log-line">
+                            <span>[00:05] NexusAI</span>
+                            <span class="log-level log-level-ai">AI</span>
+                            <span>Correlated 37 alerts into incident INC-4310</span>
+                        </div>
+                        <div class="log-line">
+                            <span>[00:08] NexusAI</span>
+                            <span class="log-level log-level-ai">AI</span>
+                            <span>Probable root cause: BGP instability after route-map change</span>
+                        </div>
+                        <div class="log-line">
+                            <span>[00:12] NexusAI</span>
+                            <span class="log-level log-level-ai">AI</span>
+                            <span>Suggested fix: revert last change on edge-gw-04 · require approval</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Solution / Features -->
+        <section id="solution" class="solution">
             <div class="container">
-                <h2>The NexusAI Solution</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <h3>AI-Powered Diagnostics</h3>
-                        <p>Our agentic workflow, powered by cutting-edge LLMs, triages alerts, asks the right questions, and pinpoints the root cause through conversational diagnosis.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Self-Improving Knowledge Base</h3>
-                        <p>Every solved ticket enriches our semantic knowledge base. NexusAI learns from past successes to provide instant solutions for recurring problems.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Seamless PRTG Integration</h3>
-                        <p>Connect directly to your PRTG monitoring system. NexusAI automatically ingests alerts via webhooks, kicking off the diagnostic process without human intervention.</p>
-                    </div>
+                <div class="section-header fade-in-up">
+                    <span class="section-pill">The NexusAI platform</span>
+                    <h2>From raw alerts to resolved tickets, with AI in the loop.</h2>
+                    <p>
+                        NexusAI connects to your existing monitoring and ITSM tools, builds a live
+                        knowledge graph of your network, and drives targeted automation where it is safe
+                        and effective.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="feature-card fade-in-up delay-1">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-powered diagnostics</h3>
+                        <p>
+                            Agentic LLM workflows read PRTG alerts, SNMP traps, logs, and topology data in real time.
+                            NexusAI asks clarifying questions, runs checks, and narrows down the root cause like a
+                            senior network engineer.
+                        </p>
+                        <div class="feature-tagline">Triage thousands of alerts into a handful of actionable incidents.</div>
+                    </article>
+
+                    <article class="feature-card fade-in-up delay-2">
+                        <div class="feature-icon" style="background:radial-gradient(circle at 30% 0,#a855f7,#4c1d95);box-shadow:0 8px 20px rgba(168,85,247,0.6);">
+                            📚
+                        </div>
+                        <h3>Self-improving knowledge graph</h3>
+                        <p>
+                            Every ticket, chat transcript, and change request is indexed into a semantic knowledge base.
+                            NexusAI learns which fixes actually worked and reuses them as playbooks for future incidents.
+                        </p>
+                        <div class="feature-tagline">Your operational memory, searchable and reusable in seconds.</div>
+                    </article>
+
+                    <article class="feature-card fade-in-up delay-3">
+                        <div class="feature-icon" style="background:radial-gradient(circle at 30% 0,#22c55e,#15803d);box-shadow:0 8px 20px rgba(34,197,94,0.6);">
+                            ⚡
+                        </div>
+                        <h3>Safe, closed-loop automation</h3>
+                        <p>
+                            From creating and updating tickets to executing changes on routers, firewalls, and cloud,
+                            NexusAI can either propose actions for approval or run fully automated workflows
+                            with guardrails.
+                        </p>
+                        <div class="feature-tagline">Keep humans in control while eliminating repetitive toil.</div>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <!-- Expertise Section -->
-        <section id="expertise">
-            <div class="container">
-                <h2>Our Expertise</h2>
-                <div class="expertise-list">
-                    <span class="expertise-item">Routing & Switching (BGP, OSPF)</span>
-                    <span class="expertise-item">Firewall & Security Policy</span>
-                    <span class="expertise-item">SNMP & WMI Monitoring</span>
-                    <span class="expertise-item">Network Latency Analysis</span>
-                    <span class="expertise-item">VoIP & QoS</span>
-                    <span class="expertise-item">Cloud Networking (AWS, Azure)</span>
+        <!-- How it works -->
+        <section id="how">
+            <div class="container how-grid">
+                <div class="fade-in-up">
+                    <span class="section-pill">How it works</span>
+                    <h2>Plug into your stack. Start resolving incidents on day one.</h2>
+                    <p class="muted" style="margin-top:0.8rem;font-size:0.95rem;">
+                        NexusAI is designed for modern network and SRE teams. No rip-and-replace, no complicated
+                        rule engines to maintain.
+                    </p>
+
+                    <div class="steps" style="margin-top:1.6rem;">
+                        <div class="step">
+                            <div class="step-index">1</div>
+                            <div>
+                                <h4>Connect monitoring & ITSM</h4>
+                                <p>
+                                    Ingest alerts from PRTG, SNMP/WMI, NetFlow, cloud metrics, and logs.
+                                    Sync incidents and changes with your ticketing system (ServiceNow, Jira Service
+                                    Management, Zendesk, and more).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-index">2</div>
+                            <div>
+                                <h4>Learn your environment</h4>
+                                <p>
+                                    NexusAI discovers devices, dependencies, and historic incidents to build a
+                                    topology-aware knowledge graph of your network and applications.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-index">3</div>
+                            <div>
+                                <h4>Automate with guardrails</h4>
+                                <p>
+                                    Start with “recommendation mode” where every AI action requires human approval.
+                                    Once you trust a playbook, flip it into full automation for specific sites, services,
+                                    or incident types.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <aside class="how-card fade-in-up delay-2">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <strong>Ticket lifecycle in NexusAI</strong>
+                            <p class="muted" style="font-size:0.78rem;margin-top:0.25rem;">
+                                Example: WAN latency degradation for remote offices
+                            </p>
+                        </div>
+                        <span class="how-pill">Automation coverage 72%</span>
+                    </div>
+
+                    <div class="how-rows">
+                        <div class="how-row">
+                            <span>Detect & correlate</span>
+                            <span>Alerts grouped into INC-4310</span>
+                        </div>
+                        <div class="how-row">
+                            <span>Diagnosis</span>
+                            <span>AI identifies QoS mis-match on WAN edge</span>
+                        </div>
+                        <div class="how-row">
+                            <span>Action proposal</span>
+                            <span>Rollback last policy · approval required</span>
+                        </div>
+                        <div class="how-row">
+                            <span>Execute change</span>
+                            <span>Config pushed to edge-gw-04 via secure pipeline</span>
+                        </div>
+                        <div class="how-row">
+                            <span>Verify & close</span>
+                            <span>Metrics back to normal · ticket auto-updated</span>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </section>
-        
-        <!-- Customers Section -->
-        <section id="customers">
+
+        <!-- Expertise -->
+        <section id="expertise" class="expertise">
             <div class="container">
-                <h2>Trusted by Leading Tech Companies</h2>
-                <div class="logos">
-                    <!-- Placeholder logos. You can replace these with real SVG logos. -->
-                    <h3 style="font-weight: 300;">TechCorp</h3>
-                    <h3 style="font-weight: 300;">Innovate Inc.</h3>
-                    <h3 style="font-weight: 300;">GlobalNet</h3>
-                    <h3 style="font-weight: 300;">Quantum Solutions</h3>
+                <div class="section-header fade-in-up">
+                    <span class="section-pill">Deep networking expertise</span>
+                    <h2>Built with real-world network operations in mind.</h2>
+                    <p>
+                        NexusAI combines large-scale LLMs with decades of hands-on experience operating
+                        carrier-grade and enterprise networks.
+                    </p>
+                </div>
+                <div class="chips fade-in-up delay-2">
+                    <span class="chip">Routing &amp; Switching (BGP, OSPF, MPLS)</span>
+                    <span class="chip">Firewall &amp; Security Policy Automation</span>
+                    <span class="chip">SNMP &amp; WMI Monitoring</span>
+                    <span class="chip">Network Latency &amp; Path Analysis</span>
+                    <span class="chip">VoIP, QoS &amp; Collaboration</span>
+                    <span class="chip">Cloud &amp; Hybrid Networking (AWS, Azure, GCP)</span>
+                    <span class="chip">Change Management &amp; ITIL Processes</span>
                 </div>
             </div>
         </section>
 
+        <!-- Customers -->
+        <section id="customers" class="customers">
+            <div class="container">
+                <div class="section-header fade-in-up">
+                    <span class="section-pill">Trusted by teams who can’t go down</span>
+                    <h2>Designed for high-stakes networks.</h2>
+                    <p>
+                        NexusAI helps enterprises, service providers, and SaaS companies keep critical
+                        connectivity healthy while shrinking their operational load.
+                    </p>
+                </div>
+                <div class="logo-row fade-in-up delay-2">
+                    <span>TECHCORP</span>
+                    <span>INNOVATE INC.</span>
+                    <span>GLOBALNET</span>
+                    <span>QUANTUM SOLUTIONS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="cta" class="cta">
+            <div class="container">
+                <div class="cta-box fade-in-up">
+                    <div>
+                        <h3 class="cta-title">See NexusAI on your own network.</h3>
+                        <p class="cta-sub">
+                            Share a sample of your monitoring data and ticket exports, and we’ll show you
+                            how much noise we can remove and what we’d automate first.
+                        </p>
+                    </div>
+                    <div class="cta-actions">
+                        <a href="#top" class="btn btn-primary">Request a live demo</a>
+                        <a href="{% url 'admin:index' %}" class="btn btn-outline">Existing customer login</a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; {% now "Y" %} NexusAI. All Rights Reserved.</p>
+    <footer>
+        <div class="container footer-inner">
+            <span>&copy; {% now "Y" %} NexusAI. All rights reserved.</span>
+            <span>
+                <a href="#top">Back to top</a>
+            </span>
+        </div>
     </footer>
-
 </body>
 </html>
