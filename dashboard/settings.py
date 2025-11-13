@@ -22,7 +22,7 @@ SECRET_KEY = 'django-insecure-your-default-development-key-change-me-later'
 DEBUG = True
 
 # Hosts/domains that are allowed to access this server.
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ainit.onrender.com']
 
 
 # dashboard/settings.py

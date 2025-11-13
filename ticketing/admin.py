@@ -89,7 +89,7 @@ class TicketAdmin(ModelAdmin):
             print("---DJANGO ADMIN---")
             print(f"✅ Captured reply for ticket {obj.id}: '{user_reply_message}'")
             
-            fastapi_url = f"http://127.0.0.1:8000/api/v1/ticket/{obj.id}/continue"
+            fastapi_url = f"https://ainit.onrender.com/api/v1/ticket/{obj.id}/continue"
             payload = {"message": user_reply_message}
             
             print(f"🚀 Sending POST request to: {fastapi_url}")
