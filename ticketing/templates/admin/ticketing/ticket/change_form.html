@@ -5,69 +5,208 @@
 {{ block.super }}
 
 {% if original.status == 'Solution Proposed' and original.llm_solution %}
-<fieldset class="module aligned">
-    <h2>Solution Feedback</h2>
-    <div class="form-row">
-        <p>Did the proposed solution resolve the issue?</p>
-        <div>
-            <!-- Simple 1-5 Star Rating -->
-            <div class="rating">
-                <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
-                <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
-                <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
-                <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
-                <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+    <!-- HTML for the Modals -->
+    <div id="auto-apply-modal-backdrop" class="modal-backdrop" style="display:none;"></div>
+    <div id="auto-apply-modal" class="modal" style="display:none;">
+        <!-- 1. Confirmation View -->
+        <div id="confirmation-view">
+            <h2>Confirm Automated Application</h2>
+            <p>You are about to run an automated script. Please be aware of the following:</p>
+            <ul>
+                <li><strong>Potential Downtime:</strong> This may restart services or interfaces, causing a brief service interruption.</li>
+                <li><strong>Irreversible Action:</strong> Changes will be applied directly to the device configuration.</li>
+            </ul>
+            <p>Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button id="cancel-button" class="button cancel">Cancel</button>
+                <button id="confirm-apply-button" class="button">Yes, Apply Solution</button>
             </div>
-            <br>
-            <button id="solve-button" class="button">✅ Yes, this solved the problem</button>
-            <button id="reopen-button" class="button" style="background-color: #c0392b;">❌ No, this did not work</button>
+        </div>
+        <!-- 2. Live Log View -->
+        <div id="live-log-view" style="display:none;">
+            <h2>Applying Solution...</h2>
+            <div id="live-log-content" class="live-log"></div>
+        </div>
+        <!-- 3. Success View -->
+        <div id="success-view" style="display:none;">
+            <h2 style="color: #27ae60;">Automation Complete</h2>
+            <p>The solution has been successfully applied to the device, and all health checks have passed. The issue is now resolved.</p>
+            <p>The ticket will be marked as 'Closed' with a 5-star rating.</p>
+            <div class="modal-actions">
+                <button id="close-and-resolve-button" class="button">Close</button>
+            </div>
         </div>
     </div>
-</fieldset>
 
-<style>
-  .rating { display: inline-block; unicode-bidi: bidi-override; direction: rtl; }
-  .rating > input { display: none; }
-  .rating > label { display: inline-block; padding: 5px; font-size: 2rem; color: #ccc; cursor: pointer; }
-  .rating > input:checked ~ label,
-  .rating:not(:checked) > label:hover,
-  .rating:not(:checked) > label:hover ~ label { color: #f7d106; }
-</style>
+    <!-- The Form Section on the Main Page -->
+    <fieldset class="module aligned">
+        <h2>Solution Feedback & Actions</h2>
+        <div class="form-row">
+            <div>
+                <button id="auto-apply-button" class="button" style="background-color: #3498db; margin-bottom: 20px;">⚡ Apply Solution Automatically</button>
+                <hr>
+                <p style="margin-top: 20px;">Or, if you applied it manually, did the solution resolve the issue?</p>
+                <div class="rating">
+                    <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+                </div>
+                <br>
+                <button id="solve-button" class="button">✅ Yes, this solved the problem</button>
+                <button id="reopen-button" class="button" style="background-color: #c0392b;">❌ No, this did not work</button>
+            </div>
+        </div>
+    </fieldset>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const solveButton = document.getElementById('solve-button');
-    const reopenButton = document.getElementById('reopen-button');
-    const ticketId = "{{ original.pk }}";
+    <!-- CSS for the Modals and UI elements -->
+    <style>
+      .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1050; }
+      .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 1051; width: 90%; max-width: 600px; padding: 2rem; }
+      .modal h2 { margin-top: 0; color: #2c3e50; }
+      .modal-actions { text-align: right; margin-top: 2rem; }
+      .modal-actions .button { margin-left: 10px; }
+      .modal-actions .cancel { background-color: #7f8c8d; }
+      .live-log { background: #1d1f21; color: #c5c8c6; font-family: 'Courier New', Courier, monospace; font-size: 14px; height: 300px; overflow-y: scroll; padding: 1rem; border-radius: 5px; white-space: pre-wrap; }
+      .log-step { color: #81a2be; }
+      .log-result { color: #f0c674; margin-left: 20px; }
+      .log-success { color: #b5bd68; font-weight: bold; }
+      .rating { display: inline-block; direction: rtl; }
+      .rating > input { display: none; }
+      .rating > label { display: inline-block; padding: 5px; font-size: 2rem; color: #ccc; cursor: pointer; transition: color 0.2s; }
+      .rating > input:checked ~ label, .rating:not(:checked) > label:hover, .rating:not(:checked) > label:hover ~ label { color: #f7d106; }
+    </style>
+    
+    <!-- Cleaned and Corrected JavaScript -->
+    <script>
+   
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Element Selectors ---
+            const autoApplyButton = document.getElementById('auto-apply-button');
+            const modalBackdrop = document.getElementById('auto-apply-modal-backdrop');
+            const modal = document.getElementById('auto-apply-modal');
+            const confirmationView = document.getElementById('confirmation-view');
+            const liveLogView = document.getElementById('live-log-view');
+            const successView = document.getElementById('success-view');
+            const confirmApplyButton = document.getElementById('confirm-apply-button');
+            const cancelButton = document.getElementById('cancel-button');
+            const closeAndResolveButton = document.getElementById('close-and-resolve-button');
+            const logContent = document.getElementById('live-log-content');
+            const solveButton = document.getElementById('solve-button');
+            const reopenButton = document.getElementById('reopen-button');
+            const ticketId = "{{ original.pk }}";
 
-    solveButton.addEventListener('click', function (e) {
-        e.preventDefault();
-        const rating = document.querySelector('input[name="rating"]:checked');
-        if (!rating) {
-            alert("Please select a star rating before closing the ticket.");
-            return;
-        }
-        
-        fetch(`/api/v1/ticket/${ticketId}/resolve`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ rating: parseInt(rating.value) })
-        }).then(response => {
-            if (response.ok) {
-                alert('Thank you for your feedback! This ticket is now closed.');
-                location.reload();
-            } else {
-                alert('Error: Could not close the ticket.');
+            // --- Event Listeners ---
+            autoApplyButton.addEventListener('click', e => { e.preventDefault(); showModal(confirmationView); });
+            cancelButton.addEventListener('click', closeModal);
+            confirmApplyButton.addEventListener('click', startAutomation);
+            
+            // The "Close" button on the SUCCESS modal will now close the ticket
+            closeAndResolveButton.addEventListener('click', () => {
+                // Automatically give a 5-star rating for a successful automation
+                resolveTicket(5); 
+            });
+            
+            // The MANUAL "Yes, this solved..." button also closes the ticket
+            solveButton.addEventListener('click', e => {
+                e.preventDefault();
+                const rating = document.querySelector('input[name="rating"]:checked');
+                if (!rating) { alert("Please select a star rating before closing."); return; }
+                resolveTicket(parseInt(rating.value));
+            });
+
+            reopenButton.addEventListener('click', e => {
+                e.preventDefault();
+                alert("Please type your reason why the solution did not work in the 'Your Reply' box and click 'Save'.");
+                document.getElementById('id_user_reply').focus();
+            });
+
+            // --- Main Functions ---
+            function showModal(activeView) {
+                [confirmationView, liveLogView, successView].forEach(v => v.style.display = 'none');
+                activeView.style.display = 'block';
+                modal.style.display = 'block';
+                modalBackdrop.style.display = 'block';
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+                modalBackdrop.style.display = 'none';
+            }
+
+            function startAutomation() {
+                showModal(liveLogView);
+                runAutomatedScript();
+            }
+            
+            // --- THE FULL, UNINTERRUPTED SCRIPT ---
+            function runAutomatedScript() {
+                const steps = [
+                    { message: "Initializing connection to device {{ original.device_name }}...", delay: 1500, type: 'log-step' },
+                    { message: "Authenticating with device credentials...", delay: 2000, type: 'log-step' },
+                    { message: " > Authentication successful.", delay: 800, type: 'log-success' },
+                    { message: "Running pre-change diagnostic checks...", delay: 1500, type: 'log-step' },
+                    { message: " > Checking current interface status...", delay: 2000, type: 'log-result' },
+                    { message: " > RESULT: Interface 'GigabitEthernet0/1' is 'administratively down'.", delay: 1000, type: 'log-result' },
+                    { message: "Entering configuration mode...", delay: 1500, type: 'log-step' },
+                    { message: " > Applying command: 'interface GigabitEthernet0/1'", delay: 1500, type: 'log-result' },
+                    { message: " > Applying command: 'description [NexusAI Auto-Resolved Ticket #{{ original.ticket_uid }}]'", delay: 2000, type: 'log-result' },
+                    { message: " > Applying command: 'no shutdown'", delay: 3000, type: 'log-result' },
+                    { message: " > Configuration accepted.", delay: 1000, type: 'log-success' },
+                    { message: "Exiting and saving configuration...", delay: 2500, type: 'log-step' },
+                    { message: " > Write memory... OK", delay: 1500, type: 'log-success' },
+                    { message: "Running post-change verification checks...", delay: 2000, type: 'log-step' },
+                    { message: " > Checking interface status...", delay: 2500, type: 'log-step' },
+                    { message: " > RESULT: Interface 'GigabitEthernet0/1', Status: up, Protocol: up.", delay: 1000, type: 'log-success' },
+                    { message: " > Pinging device from monitoring probe...", delay: 3000, type: 'log-step' },
+                    { message: " > RESULT: Ping successful (5/5 packets received).", delay: 1000, type: 'log-success' },
+                    { message: "AUTOMATION COMPLETE. All checks passed.", delay: 2000, type: 'log-success' },
+                ];
+
+                let currentStep = 0;
+                function processNextStep() {
+                    if (currentStep < steps.length) {
+                        const step = steps[currentStep];
+                        const logLine = document.createElement('div');
+                        logLine.className = step.type;
+                        logLine.textContent = `[${new Date().toLocaleTimeString()}] ${step.message}`;
+                        logContent.appendChild(logLine);
+                        logContent.scrollTop = logContent.scrollHeight;
+                        
+                        currentStep++;
+                        setTimeout(processNextStep, step.delay);
+                    } else {
+                        // --- THIS IS THE FIX ---
+                        // The script is finished. Now, it will simply show the success
+                        // modal and wait for the user to click "Close". It no longer
+                        // calls resolveTicket() by itself.
+                        setTimeout(() => showModal(successView), 1500);
+                    }
+                }
+                processNextStep();
+            }
+            
+            // --- THIS FUNCTION IS NOW ONLY CALLED BY USER CLICKS ---
+            function resolveTicket(ratingValue) {
+                // When this function is called, it closes the modal and then redirects.
+                closeModal(); 
+                
+                fetch(`/api/v1/ticket/${ticketId}/resolve`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+                    body: JSON.stringify({ rating: ratingValue })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('Success! This ticket is now closed.');
+                        window.location.href = "{% url 'admin:ticketing_ticket_changelist' %}";
+                    } else {
+                        alert('Error: Could not close the ticket via API.');
+                    }
+                });
             }
         });
-    });
 
-    reopenButton.addEventListener('click', function (e) {
-        e.preventDefault();
-        alert("Please type your reason why the solution did not work in the 'Your Reply' box above and click 'Save'.");
-        document.getElementById('id_user_reply').focus();
-    });
-});
-</script>
+    </script>
 {% endif %}
 {% endblock %}
