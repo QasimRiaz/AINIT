@@ -18,6 +18,10 @@ class Ticket(models.Model):
     resolution_feedback = models.CharField(max_length=50, blank=True, null=True)
     solution_rating = models.IntegerField(blank=True, null=True)
 
+    ready_for_fix = models.JSONField(blank=True, null=True)
+    inventory_host = models.TextField(blank=True, null=True)
+    auto_apply = models.BooleanField(default=False)
+
     # ADD THESE NEW FIELDS
     sensor = models.CharField(max_length=255, blank=True, null=True)
     prtg_status = models.CharField(max_length=255, blank=True, null=True)

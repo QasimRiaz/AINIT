@@ -37,7 +37,8 @@ class TicketAdmin(ModelAdmin):
     # All fields that are populated by the system should be read-only
     readonly_fields = (
         'id', 'ticket_uid', 'created_at', 'updated_at', 'assigned_agent', 'display_conversation',
-        'llm_solution', 'sensor', 'prtg_status', 'prtg_message'
+        'llm_solution', 'sensor', 'prtg_status', 'prtg_message',
+        'ready_for_fix', 'inventory_host', 'auto_apply'
     )
 
     # Organize the ticket detail page into logical, collapsible sections
